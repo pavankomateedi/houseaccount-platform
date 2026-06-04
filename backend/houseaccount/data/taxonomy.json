@@ -1,0 +1,20 @@
+{
+  "source": "taskrabbit-grounded",
+  "note": "Curated canonical service keys, verified against a live TaskRabbit public-category fetch on 2026-06-03 (raw fetch saved in taskrabbit_categories_raw.txt). Tilted toward HouseAccount's repairs-and-maintenance focus. Committed so the build is reproducible offline.",
+  "services": [
+    {"key": "house_cleaning",        "label": "House & Apartment Cleaning", "group": "cleaning"},
+    {"key": "deep_cleaning",         "label": "Deep / Move-out Cleaning",   "group": "cleaning"},
+    {"key": "furniture_assembly",    "label": "Furniture Assembly",         "group": "assembly"},
+    {"key": "tv_mounting",           "label": "TV & Art Mounting",          "group": "assembly"},
+    {"key": "help_moving",           "label": "Help Moving",                "group": "moving"},
+    {"key": "heavy_lifting",         "label": "Heavy Lifting & Loading",    "group": "moving"},
+    {"key": "junk_removal",          "label": "Trash & Junk Removal",       "group": "moving"},
+    {"key": "handyman",              "label": "General Handyman",           "group": "repairs"},
+    {"key": "plumbing",             "label": "Plumbing Help",              "group": "repairs"},
+    {"key": "electrical",           "label": "Electrical Help",            "group": "repairs"},
+    {"key": "appliance_repair",      "label": "Appliance Installation & Repair", "group": "repairs"},
+    {"key": "painting",             "label": "Interior Painting",          "group": "improvement"},
+    {"key": "yard_work",            "label": "Yard Work & Lawn Care",      "group": "outdoor"},
+    {"key": "smart_home",           "label": "Smart Home Installation",    "group": "improvement"}
+  ]
+}

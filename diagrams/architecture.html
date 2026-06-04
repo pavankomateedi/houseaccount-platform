@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HouseAccount — Architecture Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --navy: #0d2440;
+        --navy-2: #143258;
+        --teal: #12a594;
+        --teal-dark: #0b7d7d;
+        --red: #d8534a;
+        --bg: #eef1f5;
+        --card: #fff;
+        --line: #e2e7ef;
+        --ink: #14202f;
+        --muted: #5e6e82;
+        --shadow: 0 2px 6px rgba(13,36,64,.06), 0 14px 34px rgba(13,36,64,.09);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; color: var(--ink); line-height: 1.55;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(1200px 600px at 100% -10%, #e7eef7 0, rgba(231,238,247,0) 55%),
+          radial-gradient(900px 500px at -10% 0%, #e9f5f2 0, rgba(233,245,242,0) 50%), var(--bg);
+      }
+      header {
+        background: linear-gradient(125deg, var(--navy) 0%, var(--navy-2) 60%, #16406b 100%);
+        color: #fff; padding: 30px 28px; display: flex; align-items: center; gap: 14px;
+        box-shadow: 0 8px 30px rgba(13,36,64,.22);
+      }
+      .mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+        background: linear-gradient(140deg, var(--teal), var(--teal-dark)); box-shadow: 0 6px 16px rgba(18,165,148,.45); }
+      .ttl { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -.4px; }
+      .ttl span { color: #5fd0c4; }
+      .sub { color: #aec3dd; font-size: 13px; }
+      main { max-width: 1180px; margin: 0 auto; padding: 28px 24px 70px; }
+      .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+      .lg { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line);
+        border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); }
+      .dot { width: 11px; height: 11px; border-radius: 3px; }
+      .dot.eng { background: #cdeee9; border: 1px solid var(--teal-dark); }
+      .dot.mkt { background: #d9e4f4; border: 1px solid var(--navy-2); }
+      .dot.risk { background: #f6d5d2; border: 1px solid var(--red); }
+      .canvas { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 24px;
+        box-shadow: var(--shadow); overflow-x: auto; }
+      .mermaid { display: flex; justify-content: center; min-width: 760px; }
+      .foot { color: var(--muted); font-size: 13px; margin-top: 16px; text-align: center; }
+      .toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+      .btn { background: var(--navy); color: #fff; border: none; border-radius: 9px; padding: 8px 14px;
+        font-size: 13px; font-weight: 600; cursor: pointer; }
+      .btn:hover { background: var(--navy-2); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="mark">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none">
+          <path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+      <div>
+        <div class="ttl">House<span>Account</span> — Architecture</div>
+        <div class="sub">Trust-first marketplace + message-intelligence engine · end-to-end system</div>
+      </div>
+    </header>
+
+    <main>
+      <div class="legend">
+        <span class="lg"><span class="dot eng"></span> Message-intelligence engine</span>
+        <span class="lg"><span class="dot mkt"></span> Marketplace core</span>
+        <span class="lg"><span class="dot risk"></span> Trust &amp; safety (human review)</span>
+      </div>
+      <div class="toolbar">
+        <button class="btn" onclick="downloadSvg()">Download SVG</button>
+      </div>
+      <div class="canvas">
+        <pre class="mermaid" id="diagram">
+flowchart TB
+    subgraph Channels["Customer channels"]
+        SMS["Text / SMS chat"]
+        WEB["Web request form"]
+    end
+    subgraph FE["Frontend (React + Vite)"]
+        IC["Insights Console"]
+        CD["Conversation drill-down"]
+        MP["Marketplace UI"]
+        RV["Ratings & Reviews"]
+    end
+    API["API (FastAPI)"]
+    subgraph ENGINE["Message-Intelligence Engine"]
+        direction TB
+        CLS{"Classifier (dual-mode)"}
+        OPUS["Claude Opus 4.8 (live, prompt-cached)"]
+        MOCK["Seeded heuristic (offline / CI)"]
+        EXTRACT["Category · entities · sentiment · urgency · confidence"]
+        ROUTER["Deterministic router (auditable rules)"]
+        INSIGHT["Insight: route + action + reason"]
+        CLS --> OPUS
+        CLS --> MOCK
+        OPUS --> EXTRACT
+        MOCK --> EXTRACT
+        EXTRACT --> ROUTER --> INSIGHT
+    end
+    subgraph MARKET["Marketplace Core"]
+        REQ["Service requests"]
+        MATCH["Matching: eligibility then rating"]
+        QUOTE["Quotes (2-hour window)"]
+        BOOK["Bookings (pay after completion)"]
+        PROV["Vetted + insured providers"]
+        REQ --> MATCH --> QUOTE --> BOOK
+        PROV --> MATCH
+    end
+    HUMAN["Human-review queue<br/>complaints · cancellations · negative · urgent · low-confidence"]
+    EVAL["Eval harness<br/>golden set + thresholds"]
+    subgraph DATA["Domain-separated stores"]
+        DM["Marketplace data"]
+        DC["Communications data"]
+        DA["Analytics / insights"]
+    end
+    SMS --> API
+    WEB --> API
+    IC --> API
+    CD --> API
+    MP --> API
+    RV --> API
+    API --> CLS
+    API --> REQ
+    INSIGHT -->|"auto · create_job"| REQ
+    INSIGHT -->|"escalate / hold"| HUMAN
+    INSIGHT --> DA
+    REQ --- DM
+    SMS --- DC
+    ENGINE -.measured by.-> EVAL
+    classDef eng fill:#e6f7f5,stroke:#0b7d7d,color:#0d2440;
+    classDef mkt fill:#e8eef8,stroke:#143258,color:#0d2440;
+    classDef risk fill:#fae3e1,stroke:#d8534a,color:#0d2440;
+    class ENGINE,CLS,OPUS,MOCK,EXTRACT,ROUTER,INSIGHT eng;
+    class MARKET,REQ,MATCH,QUOTE,BOOK,PROV mkt;
+    class HUMAN risk;
+        </pre>
+      </div>
+      <p class="foot">
+        Chat → classify → extract → deterministic route → auto-act · escalate · aggregate.
+        The model judges; explicit code decides.
+      </p>
+    </main>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#e8eef8",
+          primaryTextColor: "#0d2440",
+          primaryBorderColor: "#143258",
+          lineColor: "#0b7d7d",
+          fontFamily: "Inter, sans-serif",
+          fontSize: "14px",
+        },
+      });
+      window.downloadSvg = () => {
+        const svg = document.querySelector("#diagram svg");
+        if (!svg) return;
+        const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "houseaccount-architecture.svg";
+        a.click();
+      };
+    </script>
+  </body>
+</html>

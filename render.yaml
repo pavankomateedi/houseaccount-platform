@@ -1,0 +1,16 @@
+# Render blueprint — one-service deploy (FastAPI serves the built React app).
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: houseaccount
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: HA_MODE
+        value: mock          # offline, deterministic, free — ideal for review
+      # To use live Claude Opus instead, set HA_MODE=live and add:
+      # - key: ANTHROPIC_API_KEY
+      #   sync: false

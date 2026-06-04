@@ -1,0 +1,25 @@
+# Python
+.venv/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+backend/*.egg-info/
+backend/houseaccount/*.egg-info/
+
+# Generated, seeded corpus (rebuilt by `cli gen` / Docker build)
+backend/houseaccount/data/corpus.json
+backend/houseaccount/data/golden.json
+
+# Node / frontend build
+node_modules/
+frontend/dist/
+
+# Local env & secrets
+.env
+*.local
+
+# Generated artifacts (regenerable)
+*.pdf
+diagrams/screenshots/

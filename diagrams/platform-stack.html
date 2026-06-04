@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HouseAccount — Platform Architecture (Layered)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --navy:#0d2440; --navy-2:#143258; --teal:#12a594; --teal-d:#0b7d7d;
+        --amber:#e0962f; --red:#d8534a; --ink:#14202f; --muted:#5e6e82;
+        --line:#dbe3ee; --bg:#eef2f7; --card:#fff;
+        --shadow:0 2px 6px rgba(13,36,64,.06), 0 12px 28px rgba(13,36,64,.08);
+      }
+      *{box-sizing:border-box;}
+      body{margin:0;font-family:"Inter",sans-serif;color:var(--ink);
+        background:radial-gradient(1000px 500px at 100% -10%, #e7eef7 0,rgba(231,238,247,0) 55%),
+        radial-gradient(800px 450px at -10% 0%, #e9f5f2 0,rgba(233,245,242,0) 50%),var(--bg);
+        -webkit-font-smoothing:antialiased;}
+      .wrap{max-width:980px;margin:0 auto;padding:26px 22px 50px;}
+      header{display:flex;align-items:center;gap:13px;color:#fff;border-radius:14px;padding:16px 20px;
+        background:linear-gradient(120deg,var(--navy),var(--navy-2) 60%,#16406b);box-shadow:var(--shadow);}
+      .mk{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+        background:linear-gradient(140deg,var(--teal),var(--teal-d));}
+      .logo{font-family:"Plus Jakarta Sans";font-weight:800;font-size:20px;letter-spacing:-.4px;}
+      .logo span{color:#5fd0c4;}
+      .sub{color:#aec3dd;font-size:12px;margin-top:2px;}
+
+      .stack{display:flex;flex-direction:column;align-items:stretch;gap:0;margin-top:18px;}
+      /* actors */
+      .actors{display:flex;gap:16px;justify-content:center;}
+      .actor{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);
+        border-radius:999px;padding:10px 20px;box-shadow:var(--shadow);font-weight:700;color:var(--navy);font-size:14px;}
+      .actor .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#e8f6f4;font-size:15px;}
+
+      .conn{display:flex;flex-direction:column;align-items:center;color:var(--muted);font-size:10.5px;padding:5px 0;}
+      .conn .ar{font-size:15px;color:var(--teal-d);line-height:1;letter-spacing:6px;}
+      .conn .lbl{margin-top:2px;}
+
+      .layer{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+        display:grid;grid-template-columns:188px 1fr;overflow:hidden;}
+      .layer .rail{background:linear-gradient(160deg,#13325a,#0f2747);color:#fff;padding:14px 16px;display:flex;flex-direction:column;justify-content:center;gap:3px;}
+      .layer .rail .n{font-size:10px;color:#6fd6c8;font-weight:700;letter-spacing:1px;}
+      .layer .rail .t{font-family:"Plus Jakarta Sans";font-weight:800;font-size:15px;line-height:1.15;}
+      .layer .rail .s{font-size:10.5px;color:#aec3dd;}
+      .layer .body{padding:13px 15px;display:flex;flex-wrap:wrap;gap:9px;align-items:center;}
+      .node{background:#f3f7fb;border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--navy);}
+      .node.alt{background:#e9f6f3;border-color:#bfe6df;color:var(--teal-d);}
+      .node.intg{background:#fbf2e3;border-color:#f0dcb6;color:#9a6212;}
+
+      /* data tier */
+      .data{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;}
+      .data .hd{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+      .data .hd .t{font-family:"Plus Jakarta Sans";font-weight:800;font-size:15px;color:var(--navy);}
+      .data .hd .s{font-size:11px;color:var(--muted);margin-left:auto;}
+      .serving{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+      .db{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:#f6f9fc;
+        border:1px solid var(--line);border-radius:11px;padding:11px 8px;}
+      .db .nm{font-size:11.5px;font-weight:700;color:var(--navy);}
+      .db .ds{font-size:9.5px;color:var(--muted);line-height:1.3;}
+      .feedback{display:flex;align-items:center;justify-content:center;gap:24px;margin:10px 0 8px;}
+      .feedback .f{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;}
+      .feedback .up{color:var(--teal-d);}
+      .feedback .down{color:var(--navy-2);}
+      .master{display:flex;align-items:center;gap:16px;justify-content:center;background:linear-gradient(135deg,#0f2747,#16406b);
+        color:#fff;border-radius:12px;padding:14px 20px;box-shadow:var(--shadow);}
+      .master .txt .nm{font-family:"Plus Jakarta Sans";font-weight:800;font-size:16px;}
+      .master .txt .ds{font-size:11px;color:#bcd0e8;}
+
+      .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;font-size:11px;color:var(--muted);justify-content:center;}
+      .legend b{color:var(--ink);}
+      .foot{text-align:center;color:var(--muted);font-size:11px;margin-top:18px;}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <span class="mk"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <div>
+          <div class="logo">House<span>Account</span> — Platform Architecture</div>
+          <div class="sub">Layered view · users on top, one master database at the core</div>
+        </div>
+      </header>
+
+      <div class="stack">
+        <!-- actors -->
+        <div class="actors">
+          <div class="actor"><span class="ic">🏠</span> Homeowner</div>
+          <div class="actor"><span class="ic">🧰</span> Service Provider</div>
+        </div>
+        <div class="conn"><span class="ar">▼ &nbsp; ▲</span><span class="lbl">interact · view results</span></div>
+
+        <!-- frontend -->
+        <div class="layer">
+          <div class="rail"><span class="n">LAYER 1</span><span class="t">Frontend Layer</span><span class="s">what users see</span></div>
+          <div class="body">
+            <span class="node">Homeowner web &amp; mobile app</span>
+            <span class="node">Provider app</span>
+            <span class="node alt">Ops / Insights console</span>
+          </div>
+        </div>
+        <div class="conn"><span class="ar">▼ &nbsp; ▲</span><span class="lbl">requests · responses</span></div>
+
+        <!-- web servers -->
+        <div class="layer">
+          <div class="rail"><span class="n">LAYER 2</span><span class="t">Web Servers</span><span class="s">serve &amp; render the frontend</span></div>
+          <div class="body">
+            <span class="node">Web server</span>
+            <span class="node">Web server</span>
+            <span class="node">Web server</span>
+            <span class="node alt">Load balancer</span>
+          </div>
+        </div>
+        <div class="conn"><span class="ar">▼ &nbsp; ▲</span><span class="lbl">read-through · responses</span></div>
+
+        <!-- caching -->
+        <div class="layer">
+          <div class="rail"><span class="n">LAYER 3</span><span class="t">Caching Layer</span><span class="s">fast reads, low latency</span></div>
+          <div class="body">
+            <span class="node alt">Edge / CDN cache</span>
+            <span class="node alt">API &amp; session cache</span>
+            <span class="node alt">Hot query cache</span>
+          </div>
+        </div>
+        <div class="conn"><span class="ar">▼ &nbsp; ▲</span><span class="lbl">on cache miss · fetch</span></div>
+
+        <!-- API / integration -->
+        <div class="layer">
+          <div class="rail"><span class="n">LAYER 4</span><span class="t">Integration / Retrieval &amp; API</span><span class="s">business logic &amp; access</span></div>
+          <div class="body">
+            <span class="node">REST / GraphQL API</span>
+            <span class="node">Retrieval &amp; search</span>
+            <span class="node intg">Integrations — payments · SMS · identity</span>
+            <span class="node alt">Message-intelligence engine</span>
+          </div>
+        </div>
+        <div class="conn"><span class="ar">▼ &nbsp; ▲</span><span class="lbl">query · serve data</span></div>
+
+        <!-- data tier -->
+        <div class="data">
+          <div class="hd"><span class="t">Data Tier</span><span class="s">serving stores feed back into the master</span></div>
+          <div class="serving">
+            <div class="db"><span style="font-size:18px">🗄️</span><span class="nm">Profiles store</span><span class="ds">homeowners · providers</span></div>
+            <div class="db"><span style="font-size:18px">💬</span><span class="nm">Messaging store</span><span class="ds">chat threads</span></div>
+            <div class="db"><span style="font-size:18px">🔎</span><span class="nm">Search / read model</span><span class="ds">match · listings</span></div>
+            <div class="db"><span style="font-size:18px">📊</span><span class="nm">Analytics store</span><span class="ds">insights · reviews</span></div>
+          </div>
+          <div class="feedback">
+            <span class="f up">▲ feedback into master</span>
+            <span class="f down">▼ sync / hydrate</span>
+          </div>
+          <div class="master">
+            <span style="font-size:26px">🛢️</span>
+            <div class="txt"><div class="nm">Master Database</div><div class="ds">single source of truth · system of record</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><b>Down ▼</b> = user request flowing toward data</span>
+        <span><b>Up ▲</b> = data / responses flowing back to users</span>
+        <span><b>Serving DBs</b> are read-optimized and write changes back to the <b>master</b></span>
+      </div>
+      <div class="foot">HouseAccount · layered platform architecture — homeowners &amp; providers on top, one master database at the core.</div>
+    </div>
+  </body>
+</html>

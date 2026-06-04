@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HouseAccount — Platform Thinking, Architecture & Capabilities</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --navy: #0d2440;
+        --navy-2: #143258;
+        --teal: #12a594;
+        --teal-dark: #0b7d7d;
+        --amber: #e0962f;
+        --red: #d8534a;
+        --green: #1f9d57;
+        --bg: #eef1f5;
+        --card: #ffffff;
+        --line: #e2e7ef;
+        --ink: #14202f;
+        --muted: #5e6e82;
+        --shadow: 0 2px 6px rgba(13, 36, 64, 0.06), 0 12px 30px rgba(13, 36, 64, 0.08);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(1200px 600px at 100% -10%, #e7eef7 0, rgba(231,238,247,0) 55%),
+          radial-gradient(900px 500px at -10% 0%, #e9f5f2 0, rgba(233,245,242,0) 50%), var(--bg);
+        color: var(--ink);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
+
+      header.hero {
+        background: linear-gradient(125deg, var(--navy) 0%, var(--navy-2) 55%, #16406b 100%);
+        color: #fff; padding: 56px 24px 48px; text-align: center;
+        box-shadow: 0 10px 40px rgba(13, 36, 64, 0.25);
+      }
+      .hero .mark {
+        width: 60px; height: 60px; border-radius: 16px; margin: 0 auto 18px;
+        background: linear-gradient(140deg, var(--teal), var(--teal-dark));
+        display: grid; place-items: center; box-shadow: 0 8px 20px rgba(18,165,148,0.45);
+      }
+      .hero h1 { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: 40px; margin: 0 0 8px; letter-spacing: -1px; }
+      .hero h1 span { color: #5fd0c4; }
+      .hero .sub { color: #aec3dd; font-size: 17px; max-width: 680px; margin: 0 auto; }
+      .hero .pills { margin-top: 22px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+      .hero .pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+
+      h2 { font-family: "Plus Jakarta Sans", sans-serif; font-size: 26px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; margin: 48px 0 6px; }
+      h2 .n { color: var(--teal-dark); font-size: 15px; font-weight: 700; display: block; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+      .lead { color: var(--muted); font-size: 16px; margin: 0 0 18px; }
+
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 26px 28px; box-shadow: var(--shadow); margin-top: 18px; }
+      .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .mini { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow); }
+      .mini h3 { margin: 0 0 6px; font-size: 16px; color: var(--navy); }
+      .mini p { margin: 0; color: var(--muted); font-size: 14.5px; }
+      .mini .tag { display: inline-block; font-size: 12px; font-weight: 700; color: var(--teal-dark); background: #e6f6f3; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px; }
+
+      ul.clean { list-style: none; padding: 0; margin: 0; }
+      ul.clean li { padding: 9px 0 9px 30px; position: relative; border-bottom: 1px dashed var(--line); font-size: 15px; }
+      ul.clean li:last-child { border-bottom: none; }
+      ul.clean li::before { content: "✓"; position: absolute; left: 0; top: 9px; color: var(--green); font-weight: 800; }
+      ul.clean.out li::before { content: "—"; color: var(--muted); }
+
+      .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+      .flow .step { background: #eef4f9; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; color: var(--navy); }
+      .flow .arrow { color: var(--teal-dark); font-weight: 800; }
+
+      .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+      .metric { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+      .metric b { display: block; font-family: "Plus Jakarta Sans", sans-serif; color: var(--navy); font-size: 15px; }
+      .metric span { color: var(--muted); font-size: 13px; }
+
+      .diagram-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; box-shadow: var(--shadow); margin-top: 18px; overflow-x: auto; }
+      .mermaid { display: flex; justify-content: center; }
+      .note { color: var(--muted); font-size: 13.5px; margin-top: 10px; }
+
+      footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 60px; }
+      @media (max-width: 760px) { .grid2, .grid3, .metrics { grid-template-columns: 1fr; } .hero h1 { font-size: 30px; } }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="none">
+          <path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <h1>House<span>Account</span> — Platform Thinking</h1>
+      <p class="sub">A trust-first home-services marketplace, with a message-intelligence engine that turns unstructured customer chats into routed, actionable insights.</p>
+      <div class="pills">
+        <span class="pill">Homeowners · Vetted Pros · Partners</span>
+        <span class="pill">Marketplace + Message Intelligence</span>
+        <span class="pill">Eval-first · Human-in-the-loop</span>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <h2><span class="n">01 — The Opportunity</span>Home repair is a trust problem, not a search problem</h2>
+      <p class="lead">
+        Homeowners don't struggle to find <em>a</em> handyman — they struggle to find one they can trust to show
+        up, do good work, and charge fairly. HouseAccount solves that by mediating the relationship: it vets and
+        insures the pros, manages the initial conversation, and stands behind the work
+        (lowest-price guarantee, $2,000 damage coverage). The homeowner describes the job; HouseAccount finds the
+        right pro within a two-hour quote window; the homeowner reviews the quote and books.
+      </p>
+      <div class="card">
+        <strong>The hidden bottleneck:</strong> because the platform <em>manages all initial communication over
+        text</em>, every request, reschedule, price question, and complaint arrives as free-form chat that a human
+        has to read, interpret, and route. That human triage layer is where speed, consistency, and cost live — and
+        it's exactly what a message-intelligence engine is built to relieve.
+      </div>
+
+      <h2><span class="n">02 — Who it's for</span>Three sides, one trusted loop</h2>
+      <div class="grid3">
+        <div class="mini"><span class="tag">Demand</span><h3>Homeowners</h3><p>Use the service free. Want the right pro, a fair price, and confidence the work is covered.</p></div>
+        <div class="mini"><span class="tag">Supply</span><h3>Service providers</h3><p>Vetted, insured handymen who pay commission for qualified, ready-to-book work.</p></div>
+        <div class="mini"><span class="tag">Channel</span><h3>Partners</h3><p>Real-estate and related businesses that route homeowners needing repairs and maintenance.</p></div>
+      </div>
+
+      <h2><span class="n">03 — The core idea</span>Two parts: the marketplace is the business, intelligence is the leverage</h2>
+      <div class="grid2">
+        <div class="mini">
+          <span class="tag">Part 1 — Marketplace</span>
+          <h3>Trust-first matching</h3>
+          <p>Request → match to vetted/insured pros (eligibility first, then rating) → quote in a 2-hour window → accept → book → pay after completion.</p>
+        </div>
+        <div class="mini">
+          <span class="tag">Part 2 — Message Intelligence</span>
+          <h3>Chats into actions</h3>
+          <p>Every customer chat is classified, key facts are extracted, and a deterministic rule routes it: automate the routine, escalate the risky, and surface the whole picture to ops.</p>
+        </div>
+      </div>
+
+      <h2><span class="n">04 — How the engine thinks</span>The model judges; explicit code decides</h2>
+      <p class="lead">Keeping orchestration out of the model makes every decision auditable and safe to automate.</p>
+      <div class="card">
+        <div class="flow">
+          <span class="step">Customer chat</span><span class="arrow">→</span>
+          <span class="step">Classify intent</span><span class="arrow">→</span>
+          <span class="step">Extract entities + sentiment</span><span class="arrow">→</span>
+          <span class="step">Deterministic route</span><span class="arrow">→</span>
+          <span class="step">Auto-act · Escalate · Aggregate</span>
+        </div>
+        <p class="note">
+          Six intents: new request · reschedule · cancellation · complaint · pricing question · follow-up.
+          Low-risk new requests auto-create a job; complaints, cancellations, negative sentiment, high urgency, or
+          low confidence are held for a human with a stated reason.
+        </p>
+      </div>
+
+      <h2><span class="n">05 — Design principles</span>What keeps it trustworthy at scale</h2>
+      <div class="grid2">
+        <div class="mini"><h3>Measured, not asserted</h3><p>Quality is gated by an offline eval against a hand-verified golden set — a number, not a claim.</p></div>
+        <div class="mini"><h3>Human-in-the-loop</h3><p>Money, trust, and safety decisions never auto-execute; they route to a person.</p></div>
+        <div class="mini"><h3>Domain-separated data</h3><p>Marketplace, communications, and analytics stay distinct for governance and scale.</p></div>
+        <div class="mini"><h3>Deterministic orchestration</h3><p>The model classifies; code routes — so behavior is explainable and testable.</p></div>
+      </div>
+
+      <h2><span class="n">06 — MVP scope</span>One city, narrow categories, real liquidity</h2>
+      <div class="grid2">
+        <div class="card">
+          <strong style="color:var(--green)">In scope</strong>
+          <ul class="clean">
+            <li>Homeowner request → match → quote → booking</li>
+            <li>Vetted, insured provider profiles</li>
+            <li>Message classification, extraction, routing</li>
+            <li>Aggregate insights / triage console</li>
+            <li>Ratings &amp; reviews</li>
+          </ul>
+        </div>
+        <div class="card">
+          <strong style="color:var(--muted)">Deferred</strong>
+          <ul class="clean out">
+            <li>Nationwide, all-category launch</li>
+            <li>Fully autonomous refunds / disputes</li>
+            <li>Predictive pricing &amp; auto-dispatch</li>
+            <li>Deep third-party field-service integrations</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2><span class="n">07 — What we'll watch</span>Liquidity and trust, together</h2>
+      <div class="metrics">
+        <div class="metric"><b>Local liquidity</b><span>match speed &amp; fill rate</span></div>
+        <div class="metric"><b>Time to first quote</b><span>vs. the 2-hour window</span></div>
+        <div class="metric"><b>Complaint &amp; review rate</b><span>quality signal</span></div>
+        <div class="metric"><b>Human-review rate</b><span>automation headroom</span></div>
+      </div>
+
+      <h2><span class="n">08 — Architecture</span>End-to-end system</h2>
+      <div class="diagram-card">
+        <pre class="mermaid">
+flowchart TB
+    subgraph Channels["Customer channels"]
+        SMS["Text / SMS chat"]
+        WEB["Web request form"]
+    end
+    subgraph FE["Frontend (React)"]
+        IC["Insights Console"]
+        CD["Conversation drill-down"]
+        MP["Marketplace UI"]
+        RV["Ratings & Reviews"]
+    end
+    API["API (FastAPI)"]
+    subgraph ENGINE["Message-Intelligence Engine"]
+        direction TB
+        CLS{"Classifier (dual-mode)"}
+        OPUS["Claude Opus 4.8 (live)"]
+        MOCK["Seeded mock (offline/CI)"]
+        EXTRACT["Category · entities · sentiment · urgency · confidence"]
+        ROUTER["Deterministic router"]
+        INSIGHT["Insight: route + action + reason"]
+        CLS --> OPUS
+        CLS --> MOCK
+        OPUS --> EXTRACT
+        MOCK --> EXTRACT
+        EXTRACT --> ROUTER --> INSIGHT
+    end
+    subgraph MARKET["Marketplace Core"]
+        REQ["Service requests"]
+        MATCH["Matching: eligibility then rating"]
+        QUOTE["Quotes (2-hour window)"]
+        BOOK["Bookings (pay after completion)"]
+        PROV["Vetted + insured providers"]
+        REQ --> MATCH --> QUOTE --> BOOK
+        PROV --> MATCH
+    end
+    HUMAN["Human-review queue (trust & safety)"]
+    EVAL["Eval harness: golden set + thresholds"]
+    SMS --> API
+    WEB --> API
+    IC --> API
+    CD --> API
+    MP --> API
+    RV --> API
+    API --> CLS
+    API --> REQ
+    INSIGHT -->|"auto · create_job"| REQ
+    INSIGHT -->|"escalate / hold"| HUMAN
+    ENGINE -.measured by.-> EVAL
+    classDef eng fill:#e6f7f5,stroke:#0b7d7d,color:#0d2440;
+    classDef mkt fill:#e8eef8,stroke:#143258,color:#0d2440;
+    classDef risk fill:#fae3e1,stroke:#d8534a,color:#0d2440;
+    class ENGINE,CLS,OPUS,MOCK,EXTRACT,ROUTER,INSIGHT eng;
+    class MARKET,REQ,MATCH,QUOTE,BOOK,PROV mkt;
+    class HUMAN risk;
+        </pre>
+      </div>
+
+      <h2><span class="n">09 — Capabilities</span>What the platform can do</h2>
+      <p class="lead">Bold branches are built in the MVP; the rest are on the roadmap.</p>
+      <div class="diagram-card">
+        <pre class="mermaid">
+mindmap
+  root((HouseAccount))
+    Homeowner
+      Describe project via chat
+      Submit web request
+      Review quotes
+      Accept and book
+      Pay after completion
+    Provider
+      Vetted and insured
+      Service and coverage areas
+      Quote in 2-hour window
+      Accept / decline
+      Warranty follow-up
+    Marketplace
+      Eligibility matching
+      Rank by rating
+      Quote generation
+      Booking lifecycle
+      Liquidity tracking
+    Message Intelligence
+      Classify intent
+      Extract entities
+      Sentiment and urgency
+      Confidence scoring
+      Dual-mode Opus plus mock
+    Workflow and Routing
+      Auto vs human-review
+      Auto job creation
+      Escalation with reason
+      Reminders
+    Trust and Safety
+      Human-review queue
+      Complaint and cancellation hold
+      Provider verification
+      Damage coverage
+    Analytics and Ops
+      Aggregate insights
+      Volume / sentiment / routing
+      Complaint and review rates
+      City-by-city scaling
+        </pre>
+      </div>
+
+      <footer>
+        HouseAccount · Platform thinking, architecture &amp; capability overview · built for houseaccount.com
+      </footer>
+    </div>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#e8eef8",
+          primaryTextColor: "#0d2440",
+          primaryBorderColor: "#143258",
+          lineColor: "#0b7d7d",
+          fontFamily: "Inter, sans-serif",
+        },
+      });
+    </script>
+  </body>
+</html>
