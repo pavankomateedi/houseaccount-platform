@@ -1,5 +1,9 @@
 # HouseAccount — Marketplace + Message-Intelligence Engine
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/pavankomateedi/houseaccount-platform)
+
+> One-click deploy spins up the full app (UI + API) on a free Render web service. First build ~3–5 min → shareable `https://…onrender.com` link. Docker image verified end-to-end.
+
 Built for **[houseaccount.com](https://www.houseaccount.com/)** ("A better way to
 take care of your home"): homeowners get matched with vetted, insured handymen,
 and **the platform handles initial communication over text**. This project
