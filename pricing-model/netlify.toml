@@ -1,0 +1,18 @@
+[build]
+command = "npm install"
+functions = "functions"
+publish = "public"
+
+[dev]
+command = "npm run dev"
+
+[[redirects]]
+from = "/.netlify/functions/*"
+to = "/.netlify/functions/:splat"
+status = 200
+
+[[headers]]
+for = "/.netlify/functions/pricing-estimate"
+[headers.values]
+Access-Control-Allow-Methods = "POST"
+Access-Control-Allow-Headers = "Authorization, Content-Type"

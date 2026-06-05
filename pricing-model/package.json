@@ -1,0 +1,17 @@
+{
+  "name": "houseaccount-pricing-model",
+  "version": "1.0.0",
+  "description": "AI pricing estimator for HouseAccount",
+  "main": "functions/pricing-estimate.js",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.0.0"
+  }
+}
