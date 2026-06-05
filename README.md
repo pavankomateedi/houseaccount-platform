@@ -99,6 +99,16 @@ frontend/src/
 diagrams/      architecture.md · capability.md
 ```
 
+## Diagrams & docs
+
+Open these `diagrams/*.html` in a browser (self-contained):
+
+- [diagrams/knowledge-graph.html](diagrams/knowledge-graph.html) — interactive knowledge graph of all entities & relationships
+- [diagrams/architecture.html](diagrams/architecture.html) — system architecture (with Download-SVG)
+- [diagrams/platform-stack.html](diagrams/platform-stack.html) — layered platform architecture (master DB at the core)
+- [diagrams/capability.md](diagrams/capability.md) · [diagrams/architecture.md](diagrams/architecture.md) — Mermaid sources
+- [DECISIONS.md](DECISIONS.md) · [DEPLOY.md](DEPLOY.md)
+
 ## Notes
 
 - **Data:** chat text is synthetic and seeded (reproducible). Only TaskRabbit's

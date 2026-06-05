@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HouseAccount — Knowledge Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
+    <style>
+      :root{--navy:#0d2440;--navy2:#143258;--teal:#12a594;--teal-d:#0b7d7d;--bg:#eef2f7;--line:#dbe3ee;--ink:#14202f;--muted:#5e6e82;}
+      *{box-sizing:border-box;} html,body{margin:0;height:100%;}
+      body{font-family:"Inter",sans-serif;color:var(--ink);background:var(--bg);display:flex;flex-direction:column;}
+      header{display:flex;align-items:center;gap:13px;color:#fff;padding:14px 22px;
+        background:linear-gradient(120deg,var(--navy),var(--navy2) 60%,#16406b);box-shadow:0 6px 22px rgba(13,36,64,.2);z-index:2;}
+      .mk{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(140deg,var(--teal),var(--teal-d));}
+      .logo{font-family:"Plus Jakarta Sans";font-weight:800;font-size:19px;letter-spacing:-.4px;}
+      .logo span{color:#5fd0c4;} .sub{color:#aec3dd;font-size:12px;margin-top:2px;}
+      .hint{margin-left:auto;font-size:11.5px;color:#9fb6d3;}
+      #graph{flex:1;min-height:0;background:
+        radial-gradient(1000px 500px at 100% 0%, #e7eef7 0,rgba(231,238,247,0) 55%),
+        radial-gradient(800px 450px at 0% 100%, #e9f5f2 0,rgba(233,245,242,0) 50%),var(--bg);}
+      .legend{position:absolute;left:18px;bottom:18px;background:rgba(255,255,255,.94);border:1px solid var(--line);
+        border-radius:12px;padding:11px 14px;box-shadow:0 8px 24px rgba(13,36,64,.12);font-size:12px;z-index:3;}
+      .legend h4{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);}
+      .legend .row{display:flex;align-items:center;gap:8px;margin:4px 0;}
+      .legend .dot{width:12px;height:12px;border-radius:50%;}
+    </style>
+  </head>
+  <body>
+    <header>
+      <span class="mk"><svg viewBox="0 0 24 24" width="21" height="21" fill="none"><path d="M3 11.5 12 4l9 7.5M5.5 10v9h13v-9M9.5 19v-5h5v5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <div><div class="logo">House<span>Account</span> — Knowledge Graph</div><div class="sub">Entities &amp; relationships across the platform</div></div>
+      <div class="hint">drag nodes · scroll to zoom · hover for detail</div>
+    </header>
+    <div id="graph"></div>
+    <div class="legend" id="legend"><h4>Entity types</h4></div>
+
+    <script>
+      const G = {
+        actor:      { color:"#12a594", label:"People & actors" },
+        platform:   { color:"#0d2440", label:"Platform" },
+        engine:     { color:"#1f9d57", label:"Message intelligence" },
+        attr:       { color:"#7c8b9d", label:"Insight attributes" },
+        domain:     { color:"#2f6fb0", label:"Domain objects" },
+        market:     { color:"#e0962f", label:"Marketplace" },
+        data:       { color:"#6b5bd2", label:"Data & infra" },
+        quality:    { color:"#d8534a", label:"Quality & trust" },
+      };
+
+      const N = [
+        // actors
+        ["homeowner","Homeowner","actor","Free user who needs home repair/maintenance"],
+        ["provider","Service Provider","actor","Vetted, insured handyman; pays commission"],
+        ["partner","Real-estate Partner","actor","Channel that refers homeowners"],
+        ["reviewer","Ops / Human Reviewer","actor","Handles escalations & high-risk actions"],
+        ["platform","HouseAccount Platform","platform","Mediates chats; system of record"],
+        // conversation + engine
+        ["conversation","Conversation (chat)","domain","Homeowner ↔ provider thread"],
+        ["message","Message","domain","A single chat turn"],
+        ["engine","Message-Intelligence Engine","engine","Reads each thread → insight"],
+        ["opus","Classifier · Claude Opus 4.8","engine","Live structured classification"],
+        ["mock","Classifier · Seeded Mock","engine","Offline/CI heuristic"],
+        ["router","Deterministic Router","engine","Decides route + action"],
+        ["insight","Insight","domain","Classification + routing decision"],
+        // insight attributes
+        ["category","Category (6 intents)","attr","new_request, complaint, …"],
+        ["entities","Entities","attr","service · timing · pricing"],
+        ["sentiment","Sentiment","attr","positive / neutral / negative"],
+        ["urgency","Urgency","attr","low / high"],
+        ["confidence","Confidence","attr","<0.55 → human review"],
+        ["auto","Route: Auto","attr","low-risk → automated"],
+        ["human","Route: Human review","attr","high-risk → person"],
+        ["action","Action","attr","create_job · escalate · remind …"],
+        // marketplace
+        ["request","Service Request","domain","Job to fulfill"],
+        ["matching","Matching","market","Eligibility then rating"],
+        ["taxonomy","Service Taxonomy","market","TaskRabbit-grounded categories"],
+        ["quote","Quote","domain","2-hour quote window"],
+        ["booking","Booking","domain","Pay after completion"],
+        ["review","Review","domain","Post-job feedback"],
+        ["rating","Rating (★)","attr","1–5 stars"],
+        // data & infra
+        ["api","API Layer","data","REST/GraphQL + retrieval"],
+        ["cache","Caching Layer","data","Fast reads"],
+        ["web","Web Servers","data","Serve the frontend"],
+        ["frontend","Frontend","data","Apps + ops console"],
+        ["serving","Serving Stores","data","Profiles · messaging · search · analytics"],
+        ["master","Master Database","data","Single source of truth"],
+        // quality
+        ["eval","Eval / Golden set","quality","Gates engine quality"],
+        ["trust","Trust & Safety","quality","Verification, oversight, coverage"],
+      ];
+
+      const E = [
+        ["homeowner","conversation","participates"],
+        ["provider","conversation","participates"],
+        ["homeowner","provider","chats with"],
+        ["partner","homeowner","refers"],
+        ["platform","conversation","has visibility"],
+        ["conversation","message","contains"],
+        ["conversation","engine","analyzed by"],
+        ["engine","opus","uses (live)"],
+        ["engine","mock","uses (mock)"],
+        ["engine","insight","produces"],
+        ["insight","category","has"],
+        ["insight","entities","has"],
+        ["insight","sentiment","has"],
+        ["insight","urgency","has"],
+        ["insight","confidence","has"],
+        ["insight","router","routed by"],
+        ["router","auto","decides"],
+        ["router","human","decides"],
+        ["insight","action","suggests"],
+        ["auto","request","auto-creates"],
+        ["human","reviewer","escalates to"],
+        ["request","matching","matched by"],
+        ["matching","taxonomy","uses"],
+        ["matching","provider","ranks"],
+        ["provider","taxonomy","serves"],
+        ["request","quote","generates"],
+        ["quote","booking","accepted →"],
+        ["booking","provider","assigned to"],
+        ["homeowner","request","submits"],
+        ["provider","review","receives"],
+        ["review","rating","has"],
+        ["review","sentiment","carries"],
+        ["frontend","api","calls"],
+        ["web","frontend","serves"],
+        ["cache","api","fronts"],
+        ["api","engine","hosts"],
+        ["api","matching","hosts"],
+        ["api","serving","reads"],
+        ["serving","master","feedback into"],
+        ["master","serving","sync / hydrate"],
+        ["engine","eval","gated by"],
+        ["human","trust","part of"],
+        ["reviewer","trust","part of"],
+        ["provider","trust","verified by"],
+        ["homeowner","frontend","uses"],
+        ["provider","frontend","uses"],
+      ];
+
+      const nodes = new vis.DataSet(N.map(([id,label,group,title])=>({
+        id,label,group,title,
+        shape:"dot", size: (group==="platform"||group==="engine"||group==="master"?24:16),
+      })));
+      const edges = new vis.DataSet(E.map(([from,to,label])=>({
+        from,to,label,arrows:"to",font:{size:10,color:"#5e6e82",strokeWidth:3,strokeColor:"#eef2f7"},
+        color:{color:"#b9c6d6",highlight:"#0b7d7d",hover:"#0b7d7d"},smooth:{type:"dynamic"},
+      })));
+
+      const groups = {};
+      Object.entries(G).forEach(([k,v])=>{
+        groups[k]={color:{background:v.color,border:v.color},font:{color:(["platform"].includes(k)?"#fff":"#14202f"),size:12,face:"Inter"}};
+      });
+
+      const net = new vis.Network(document.getElementById("graph"), {nodes,edges}, {
+        groups,
+        nodes:{borderWidth:2,shadow:{enabled:true,size:6,color:"rgba(13,36,64,0.15)"}},
+        physics:{barnesHut:{gravitationalConstant:-9000,springLength:135,springConstant:0.035,damping:0.5},stabilization:{iterations:300}},
+        interaction:{hover:true,tooltipDelay:120,navigationButtons:false},
+      });
+
+      // legend
+      const lg=document.getElementById("legend");
+      Object.values(G).forEach(v=>{
+        const r=document.createElement("div");r.className="row";
+        r.innerHTML=`<span class="dot" style="background:${v.color}"></span>${v.label}`;lg.appendChild(r);
+      });
+      net.once("stabilizationIterationsDone",()=>net.fit({animation:false}));
+    </script>
+  </body>
+</html>
