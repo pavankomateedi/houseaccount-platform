@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://houseaccount/pricing-estimate.response.schema.json",
+  "title": "Pricing estimate response (200)",
+  "description": "Success body returned by POST /.netlify/functions/pricing-estimate (Appendix A).",
+  "type": "object",
+  "required": [
+    "ok",
+    "job_id",
+    "estimate_lo",
+    "estimate_hi",
+    "estimate_midpoint",
+    "confidence",
+    "model_version"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ok": { "const": true },
+    "job_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Echoes the request job_id."
+    },
+    "estimate_lo": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Low bound of the price range, USD."
+    },
+    "estimate_hi": {
+      "type": "number",
+      "minimum": 0,
+      "description": "High bound of the price range, USD."
+    },
+    "estimate_midpoint": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Point estimate, USD; what MAPE is computed against."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Calibrated confidence; < 0.5 for out-of-distribution inputs."
+    },
+    "model_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Attributes the prediction to a candidate submission."
+    }
+  }
+}

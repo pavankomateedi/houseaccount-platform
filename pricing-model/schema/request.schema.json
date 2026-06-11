@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://houseaccount/pricing-estimate.request.schema.json",
+  "title": "Pricing estimate request",
+  "description": "Booking payload accepted by POST /.netlify/functions/pricing-estimate (Appendix A).",
+  "type": "object",
+  "required": ["job_id", "service_category", "zip_code", "job_description"],
+  "additionalProperties": true,
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable identifier for this estimate request; echoed in the response."
+    },
+    "service_category": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Free-text category. Any string accepted; not strictly validated."
+    },
+    "zip_code": {
+      "type": "string",
+      "pattern": "^\\d{5}(?:-\\d{4})?$",
+      "description": "5-digit US ZIP (optionally +4)."
+    },
+    "job_description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Homeowner free-text describing the job; the scope-extraction surface."
+    },
+    "service_subtype": {
+      "type": "string",
+      "description": "Sub-classification hint within the category; not a strict validator."
+    },
+    "deadline": {
+      "type": "string",
+      "enum": [
+        "As soon as possible",
+        "Within 1-2 weeks",
+        "Within 1 month",
+        "I'm flexible"
+      ],
+      "description": "Exact canonical strings, including the ASCII apostrophe in I'm flexible."
+    },
+    "booking_month": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}$",
+      "description": "YYYY-MM resolution, matching the training dataset."
+    },
+    "job_status": {
+      "type": "string",
+      "description": "Free-text status from the homeowner's perspective. Accepted if provided."
+    },
+    "original_estimate": {
+      "type": ["number", "null"],
+      "description": "Previous-model midpoint, when available."
+    },
+    "original_estimate_lo": {
+      "type": ["number", "null"],
+      "description": "Previous-model low bound."
+    },
+    "original_estimate_hi": {
+      "type": ["number", "null"],
+      "description": "Previous-model high bound."
+    }
+  }
+}

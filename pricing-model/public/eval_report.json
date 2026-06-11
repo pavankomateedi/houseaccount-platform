@@ -1,0 +1,23 @@
+[
+  {
+    "label": "blended (full)",
+    "n": 411,
+    "baseline_mape": 14.65,
+    "model_mape": 8.92,
+    "beats": true
+  },
+  {
+    "label": "held-out",
+    "n": 82,
+    "baseline_mape": 15.61,
+    "model_mape": 11.53,
+    "beats": true
+  },
+  {
+    "label": "held-out real (APE>=25%)",
+    "n": 14,
+    "baseline_mape": 36.23,
+    "model_mape": 20.66,
+    "beats": true
+  }
+]

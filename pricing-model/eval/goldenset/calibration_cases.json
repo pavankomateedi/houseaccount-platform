@@ -1,0 +1,41 @@
+{
+  "description": "Golden confidence/OOD cases. Consumed by both pricing.calibration (Python) and functions/_lib/calibration.js so the two implementations stay identical. median_interval is supplied per-file to keep cases self-contained.",
+  "median_interval": 300,
+  "cases": [
+    {
+      "name": "clean in-distribution plumbing is confident",
+      "midpoint": 450, "lo": 380, "hi": 520, "category": "Plumbing",
+      "expect": { "confidence_min": 0.75, "flags": { "price": false, "interval": false, "category": false } }
+    },
+    {
+      "name": "tight interval in-distribution is highly confident",
+      "midpoint": 600, "lo": 560, "hi": 640, "category": "HVAC",
+      "expect": { "confidence_min": 0.8 }
+    },
+    {
+      "name": "price above $5k is OOD",
+      "midpoint": 8000, "lo": 7000, "hi": 9000, "category": "Plumbing",
+      "expect": { "confidence_max": 0.4999, "flags": { "price": true } }
+    },
+    {
+      "name": "interval wider than 3x median is OOD",
+      "midpoint": 600, "lo": 100, "hi": 1200, "category": "Plumbing",
+      "expect": { "confidence_max": 0.4999, "flags": { "interval": true } }
+    },
+    {
+      "name": "non-production category is OOD",
+      "midpoint": 500, "lo": 420, "hi": 600, "category": "Roofing",
+      "expect": { "confidence_max": 0.4999, "flags": { "category": true } }
+    },
+    {
+      "name": "midpoint just under $5k with tight interval stays in-distribution",
+      "midpoint": 4999, "lo": 4850, "hi": 5150, "category": "HVAC",
+      "expect": { "confidence_min": 0.5, "flags": { "price": false, "interval": false, "category": false } }
+    },
+    {
+      "name": "multiple OOD conditions compound to very low confidence",
+      "midpoint": 9000, "lo": 2000, "hi": 16000, "category": "Pool",
+      "expect": { "confidence_max": 0.2, "flags": { "price": true, "interval": true, "category": true } }
+    }
+  ]
+}

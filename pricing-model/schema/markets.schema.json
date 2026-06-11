@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://houseaccount/markets.schema.json",
+  "title": "Serviced markets",
+  "description": "public/markets.json — the metro markets and their serviced ZIPs, emitted by eval/export_ui.py from pricing/markets.py. Drives the pricing page's market/ZIP selectors.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["name", "zips"],
+    "additionalProperties": false,
+    "properties": {
+      "name": { "type": "string", "description": "Market display name, e.g. \"New York, NY\"." },
+      "zips": {
+        "type": "array",
+        "minItems": 1,
+        "items": { "type": "string", "pattern": "^\\d{5}$" },
+        "description": "The 1-2 serviced ZIPs in this market."
+      }
+    }
+  }
+}

@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HouseAccount — Instant Pricing & Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Public+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f7f1e7; --paper-2: #fffdf9; --card: #ffffff;
+        --ink: #1f1b16; --muted: #756b5c; --line: #e7ddcd;
+        --teal: #0f6b58; --teal-deep: #0a4f41; --terra: #c4602f; --gold: #d99a2b;
+        --good: #0f6b58; --ok: #c08a1e; --soft: #9a5b3b;
+        --shadow: 0 1px 2px rgba(31,27,22,.04), 0 12px 30px -12px rgba(31,27,22,.18);
+      }
+      * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+      html { scroll-behavior: smooth; }
+      body { margin: 0; color: var(--ink); background: var(--paper);
+        font-family: "Hanken Grotesk", system-ui, sans-serif;
+        background-image:
+          radial-gradient(60% 50% at 85% -5%, rgba(15,107,88,.10), transparent 60%),
+          radial-gradient(50% 40% at -5% 0%, rgba(196,96,47,.10), transparent 55%);
+        background-attachment: fixed; }
+      .serif { font-family: "Fraunces", Georgia, serif; }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+      .bar { display: flex; align-items: center; justify-content: space-between;
+        padding: 20px 22px; max-width: 1080px; margin: 0 auto; }
+      .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+      .logo { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+        background: var(--teal); color: #fff; font-family: "Fraunces"; font-weight: 700; }
+      .pill { font-size: 12px; color: var(--teal-deep); background: rgba(15,107,88,.10);
+        border: 1px solid rgba(15,107,88,.20); padding: 5px 11px; border-radius: 99px; font-weight: 600; }
+      .bar-right { display: flex; align-items: center; gap: 14px; }
+      .homelink { color: var(--teal-deep); font-weight: 600; font-size: 13.5px; text-decoration: none; }
+      .homelink:hover { text-decoration: underline; }
+      a.brand { text-decoration: none; color: inherit; }
+
+      .hero { padding: 22px 0 6px; }
+      .hero h1 { font-size: clamp(32px, 5vw, 54px); line-height: 1.02; margin: 8px 0 12px;
+        font-weight: 600; letter-spacing: -0.015em; }
+      .hero h1 em { font-style: italic; color: var(--terra); }
+      .hero p { font-size: 18px; color: var(--muted); max-width: 56ch; margin: 0; }
+      .synth { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px;
+        font-size: 13px; color: var(--soft); background: rgba(196,96,47,.08);
+        border: 1px dashed rgba(196,96,47,.35); padding: 7px 13px; border-radius: 99px; }
+      .synth b { color: var(--terra); }
+
+      .stage { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 22px; margin: 20px 0 8px; align-items: start; }
+      @media (max-width: 880px) { .stage { grid-template-columns: 1fr; } }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+        box-shadow: var(--shadow); padding: 22px; }
+      .card h2 { font-family: "Fraunces"; font-weight: 600; font-size: 20px; margin: 0 0 14px; }
+      .eyebrow { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+      label { display: block; font-size: 12.5px; color: var(--muted); margin: 12px 0 5px; font-weight: 600; }
+      input, select, textarea { width: 100%; background: var(--paper-2); border: 1px solid var(--line);
+        color: var(--ink); border-radius: 11px; padding: 11px 12px; font: inherit; transition: border-color .15s, box-shadow .15s; }
+      input:focus, select:focus, textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(15,107,88,.12); }
+      textarea { resize: vertical; min-height: 70px; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+      details { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 6px; }
+      summary { cursor: pointer; font-size: 13px; color: var(--teal-deep); font-weight: 600; padding: 6px 0; list-style: none; }
+      summary::-webkit-details-marker { display: none; }
+      summary::before { content: "+ "; } details[open] summary::before { content: "– "; }
+
+      .btn { display: inline-flex; justify-content: center; align-items: center; gap: 8px; width: 100%;
+        border: 0; border-radius: 12px; padding: 13px; font: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
+        transition: transform .08s, background .15s, border-color .15s; }
+      .btn:active { transform: translateY(1px); }
+      .btn-primary { background: var(--teal); color: #fff; box-shadow: 0 10px 24px -12px rgba(15,107,88,.7); }
+      .btn-primary:hover { background: var(--teal-deep); }
+      .btn-ghost { background: transparent; color: var(--teal-deep); border: 1px solid var(--line); }
+      .btn-ghost:hover { border-color: var(--teal); }
+      .btn-terra { background: var(--terra); color: #fff; }
+      .btn-terra:hover { filter: brightness(.95); }
+      .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 16px; }
+
+      .quote { position: sticky; top: 16px; }
+      .price { font-family: "Fraunces"; font-weight: 600; font-size: 56px; line-height: 1; letter-spacing: -0.02em; margin: 2px 0 4px; }
+      .range { color: var(--muted); font-size: 15px; }
+      .trust { margin: 18px 0 6px; }
+      .trust .meter { height: 12px; border-radius: 99px; background: #efe7d8; overflow: hidden; }
+      .trust .meter > span { display: block; height: 100%; border-radius: 99px; width: 0; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+      .trust .lab { display: flex; justify-content: space-between; margin-top: 8px; font-size: 13.5px; }
+      .trust .lab b { font-weight: 700; }
+      .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+      .chip { font-size: 12px; padding: 5px 11px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); background: var(--paper-2); }
+      .chip.good { color: #fff; background: var(--teal); border-color: transparent; font-weight: 600; }
+      .chip.flag { color: var(--soft); background: rgba(196,96,47,.10); border-color: rgba(196,96,47,.3); }
+      .ask { margin-top: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+      .ask .h { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--teal-deep); font-weight: 700; margin-bottom: 8px; }
+      .ask .note { font-size: 13.5px; color: var(--soft); margin-bottom: 10px; }
+      .ask ul { margin: 0; padding-left: 18px; } .ask li { margin: 6px 0; font-size: 14.5px; }
+
+      /* providers / pricing page */
+      .back { background: none; border: 0; color: var(--teal-deep); font: inherit; font-weight: 600; cursor: pointer; padding: 0; margin-bottom: 6px; }
+      .opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 6px; }
+      @media (max-width: 760px) { .opts { grid-template-columns: 1fr; } }
+      .opt { border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: var(--paper-2);
+        display: flex; flex-direction: column; transition: border-color .15s, transform .1s, box-shadow .15s; }
+      .opt:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: var(--shadow); }
+      .opt .tag { align-self: flex-start; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; margin-bottom: 10px; }
+      .tag-value { background: rgba(15,107,88,.12); color: var(--teal-deep); }
+      .tag-top { background: rgba(217,154,43,.16); color: #936408; }
+      .tag-none { visibility: hidden; }
+      .opt .name { font-weight: 700; font-size: 16px; }
+      .opt .meta { color: var(--muted); font-size: 13px; margin: 3px 0 12px; }
+      .opt .p { font-family: "Fraunces"; font-weight: 600; font-size: 30px; margin-top: auto; }
+      .opt .eta { color: var(--muted); font-size: 12.5px; margin-bottom: 12px; }
+
+      .summary { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+      .summary .r { display: flex; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+      .summary .r:last-child { border-bottom: 0; }
+      .summary .r .k { color: var(--muted); } .summary .r .v { font-weight: 600; text-align: right; }
+      .summary .total { background: var(--paper); font-size: 16px; }
+      .summary .total .v { font-family: "Fraunces"; }
+
+      /* bookings */
+      .bookings { margin-top: 30px; }
+      .bk { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center;
+        border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; background: var(--card); margin-bottom: 10px; }
+      .bk .who { font-weight: 700; } .bk .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+      .bk .right { text-align: right; }
+      .bk .amt { font-family: "Fraunces"; font-weight: 600; font-size: 18px; }
+      .status { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; display: inline-block; }
+      .st-book { background: rgba(15,107,88,.14); color: var(--teal-deep); }
+      .st-enq { background: rgba(217,154,43,.18); color: #936408; }
+      .empty { color: var(--muted); font-size: 14px; padding: 6px 0; }
+
+      .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+        background: var(--ink); color: #fff; padding: 12px 18px; border-radius: 12px; font-size: 14px; font-weight: 600;
+        opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 50; }
+      .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+      .behind { margin-top: 38px; padding-top: 8px; border-top: 1px solid var(--line); }
+      .behind .lede { font-family: "Fraunces"; font-size: 24px; font-weight: 600; margin: 18px 0 4px; }
+      .behind .deck { color: var(--muted); margin: 0 0 18px; max-width: 60ch; }
+      .insights { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+      @media (max-width: 880px) { .insights { grid-template-columns: 1fr; } }
+      table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+      th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid var(--line); }
+      th { color: var(--muted); font-weight: 600; }
+      td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+      .beats { color: var(--good); font-weight: 700; }
+      .bar-mini { height: 9px; background: linear-gradient(90deg, var(--teal), #2a9b82); border-radius: 5px; }
+      .stat { color: var(--muted); font-size: 13.5px; line-height: 1.6; }
+      .mk { display: inline-flex; align-items: center; gap: 6px; margin: 0 12px 6px 0; font-size: 13px; }
+      .mk .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+      .submk { font-size: 11px; color: var(--muted); }
+      .full { grid-column: 1 / -1; }
+      .sec-title { font-family: "Fraunces"; font-weight: 600; font-size: 22px; margin: 6px 0 0; }
+      footer { color: var(--muted); font-size: 13px; padding: 30px 0 50px; }
+      .mono { font-variant-numeric: tabular-nums; }
+      .reveal { opacity: 0; transform: translateY(10px); animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards; }
+      .d1 { animation-delay: .05s; } .d2 { animation-delay: .14s; }
+      @keyframes rise { to { opacity: 1; transform: none; } }
+      @media (prefers-reduced-motion: reduce) { .reveal { animation: none; opacity: 1; transform: none; } }
+
+      /* ===== Storefront theme — match Services / Providers (later cascade wins) ===== */
+      :root {
+        --paper: #f5f7fa; --paper-2: #ffffff; --card: #ffffff;
+        --ink: #16263a; --muted: #5d6b7d; --line: #e2e8f0;
+        --teal: #1d4e89; --teal-deep: #16335a; --terra: #8a5a18; --gold: #f5a623;
+        --good: #2e7d52; --ok: #a05a12; --soft: #a05a12;
+        --green: #2e7d52; --green-soft: #e7f3ec;
+        --font-display: "Plus Jakarta Sans", system-ui, sans-serif;
+        --font-body: "Public Sans", system-ui, sans-serif;
+        --shadow: 0 10px 28px -10px rgba(22,38,58,.18);
+      }
+      body { font-family: var(--font-body); background: var(--paper); background-image: none; }
+      .serif { font-family: var(--font-display); }
+      .wrap { width: min(1180px, 100% - 48px); max-width: none; padding: 0; }
+
+      .site-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.92);
+        backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+      .site-header .inner { width: min(1180px, 100% - 48px); margin: 0 auto; display: flex;
+        align-items: center; gap: 22px; height: 64px; }
+      .site-header .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; color: inherit; flex: none;
+        width: auto; height: auto; background: none; border-radius: 0; }
+      .site-header .logo .mark { display: grid; place-items: center; width: 36px; height: 36px;
+        border-radius: 10px; background: var(--teal); color: #fff; }
+      .site-header .logo .word { font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -.02em; }
+      .site-header .logo .word em { font-style: normal; color: var(--teal); }
+      .site-header .links { display: flex; gap: 4px; }
+      .site-header .links a { padding: 8px 13px; border-radius: 9px; font-weight: 600; color: var(--muted); text-decoration: none; }
+      .site-header .links a:hover { color: var(--ink); background: var(--paper); }
+      .site-header .links a.on { color: var(--teal); background: color-mix(in oklab, var(--teal) 9%, white); }
+      .site-header .cart-btn { margin-left: auto; display: grid; place-items: center; width: 42px; height: 42px;
+        border-radius: 11px; border: 1.5px solid var(--line); background: var(--card); color: var(--muted); text-decoration: none; }
+      .site-header .cart-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+      .hero { background: linear-gradient(160deg, color-mix(in oklab, var(--teal) 96%, black), color-mix(in oklab, var(--teal) 72%, #0c1a2e));
+        color: #fff; padding: 44px 0 40px; margin: 0; }
+      .hero .inner { width: min(1180px, 100% - 48px); margin: 0 auto; }
+      .hero h1 { font-family: var(--font-display); font-weight: 800; letter-spacing: -.025em;
+        font-size: clamp(28px, 4vw, 40px); color: #fff; margin: 8px 0 10px; }
+      .hero h1 em { font-style: normal; color: #bcd3f2; }
+      .hero p { color: rgba(255,255,255,.85); font-size: 16px; }
+      .eyebrow.light { color: rgba(255,255,255,.7); }
+      .hero .synth { color: rgba(255,255,255,.92); background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.28); }
+      .hero .synth b { color: #fff; }
+
+      .card { border-radius: var(--radius, 14px); box-shadow: none; }
+      .card h2, .sec-title, .behind .lede, .summary .total .v, .bk .amt, .opt .p, .price { font-family: var(--font-display); }
+      .card h2 { font-weight: 800; }
+      .eyebrow { font-weight: 700; letter-spacing: .06em; }
+      input, select, textarea { background: var(--paper); border-width: 1.5px; border-radius: 10px; }
+      input:focus, select:focus, textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px color-mix(in oklab, var(--teal) 14%, white); }
+      summary { color: var(--teal); }
+      .btn { border-radius: 10px; font-weight: 600; }
+      .btn-primary { background: var(--teal); box-shadow: none; }
+      .btn-primary:hover { background: var(--teal); filter: brightness(1.12); }
+      .opt { border-radius: var(--radius, 14px); }
+      .opt:hover { border-color: var(--teal); box-shadow: var(--shadow); }
+      .trust .meter { background: #e7edf3; }
+      .chip.good { background: var(--green); }
+      .chip.flag { color: var(--ok); background: #fdf1e2; border-color: #f0dcc0; }
+      .ask { background: var(--paper); border-radius: 12px; }
+      .ask .h { color: var(--teal); }
+      .ask .note { color: var(--ok); }
+      .tag-value { background: var(--green-soft); color: var(--green); }
+      .tag-top { background: #fdf1e2; color: var(--ok); }
+      .st-book { background: var(--green-soft); color: var(--green); }
+      .st-enq { background: #fdf1e2; color: var(--ok); }
+      .bar-mini { background: linear-gradient(90deg, var(--teal), #4f80c0); }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="inner">
+        <a class="logo" href="index.html" aria-label="HouseAccount.AI home">
+          <span class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3 11.2 12 3.5l9 7.7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.5 10.2V20h13v-9.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M9.5 20v-5.5h5V20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg></span>
+          <span class="word">HouseAccount<em>.AI</em></span>
+        </a>
+        <nav class="links">
+          <a href="index.html">Services</a>
+          <a href="index.html#/catalog/providers">Providers</a>
+          <a class="on" href="pricing.html">Instant Estimate</a>
+        </nav>
+        <a class="cart-btn" href="index.html" aria-label="Browse services">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 7h14l-1.2 9.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 7a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+        </a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="inner">
+        <div class="eyebrow light">AI pricing engine</div>
+        <h1>Know the price, <em>then</em> book a pro.</h1>
+        <p>Transparent AI estimates, real provider quotes in your market, and a one-tap booking — or just send an enquiry.</p>
+        <div id="synth" class="synth" hidden></div>
+      </div>
+    </section>
+
+    <div class="wrap">
+
+      <!-- VIEW: estimate -->
+      <section class="stage" id="view-estimate">
+        <div class="card reveal d1">
+          <div class="eyebrow">Tell us about the job</div>
+          <h2 class="serif">Build your estimate</h2>
+          <div class="row">
+            <div><label>Market</label><select id="market"></select></div>
+            <div><label>ZIP code</label><select id="zip"></select></div>
+          </div>
+          <label>Service category</label>
+          <select id="category"></select>
+          <label>What needs doing?</label>
+          <textarea id="desc">Replace 4 plumbing fixtures, you supply materials</textarea>
+          <label>Deadline</label>
+          <select id="deadline">
+            <option>As soon as possible</option>
+            <option selected>Within 1-2 weeks</option>
+            <option>Within 1 month</option>
+            <option>I'm flexible</option>
+          </select>
+          <details>
+            <summary>Have a prior quote? Add it to sharpen the estimate</summary>
+            <div class="row" style="margin-top:8px">
+              <div><label>Booking month</label><input id="month" value="2026-05" /></div>
+              <div><label>Prior estimate ($)</label><input id="orig" type="number" value="360" /></div>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <div><label>Prior low ($)</label><input id="lo" type="number" value="270" /></div>
+              <div><label>Prior high ($)</label><input id="hi" type="number" value="520" /></div>
+            </div>
+          </details>
+          <button class="btn btn-primary" id="go" style="margin-top:18px">Get my estimate</button>
+        </div>
+
+        <div class="card quote reveal d2" id="result" hidden>
+          <span class="eyebrow">Your AI estimate</span>
+          <div class="price serif" id="mid">—</div>
+          <div class="range" id="range"></div>
+          <div class="trust">
+            <div class="meter"><span id="confbar"></span></div>
+            <div class="lab"><b id="trustlabel"></b><span class="muted"><span id="confval"></span> confidence</span></div>
+          </div>
+          <div class="chips" id="badges"></div>
+          <div class="ask" id="ask" hidden></div>
+          <button class="btn btn-primary" id="toproviders" style="margin-top:18px">See pricing options &amp; book →</button>
+          <div class="muted" style="margin-top:12px; font-size:12px">model <span class="mono" id="ver"></span></div>
+        </div>
+      </section>
+
+      <!-- VIEW: providers / pricing page -->
+      <section id="view-providers" hidden>
+        <button class="back" id="back-estimate">← Back to estimate</button>
+        <div class="card">
+          <div class="eyebrow" id="opt-where"></div>
+          <h2 class="serif">Choose a pricing option</h2>
+          <div class="opts" id="opts"></div>
+        </div>
+      </section>
+
+      <!-- VIEW: checkout / enquiry -->
+      <section id="view-confirm" hidden>
+        <button class="back" id="back-providers">← Back to options</button>
+        <div class="stage">
+          <div class="card">
+            <div class="eyebrow">Review</div>
+            <h2 class="serif">Confirm your booking</h2>
+            <div class="summary" id="confirm-summary"></div>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="checkout">Complete booking</button>
+              <button class="btn btn-ghost" id="enquiry">Send enquiry instead</button>
+            </div>
+            <p class="stat" style="margin-top:12px">Checkout confirms the job now. An enquiry just asks the provider to reach out — no commitment.</p>
+          </div>
+          <div class="card quote">
+            <span class="eyebrow">Your AI estimate</span>
+            <div class="price serif" id="c-mid"></div>
+            <div class="range" id="c-range"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- bookings -->
+      <section class="bookings">
+        <div class="sec-title serif">Your bookings</div>
+        <p class="stat" style="margin:2px 0 14px">Confirmed bookings and enquiries appear here and persist on this device.</p>
+        <div id="bookings-list"></div>
+      </section>
+
+      <!-- behind the model -->
+      <section class="behind">
+        <div class="eyebrow">Behind the model</div>
+        <div class="lede serif">How we keep the price fair</div>
+        <p class="deck">Every estimate is scored against the previous pricing baseline on held-out jobs. Here's the report card and the markets it learned from.</p>
+        <div class="insights">
+          <div class="card">
+            <h2 class="serif">Report card <span class="muted" id="evalnote" style="font-size:13px"></span></h2>
+            <table>
+              <thead><tr><th>Test</th><th class="num">jobs</th><th class="num">baseline</th><th class="num">our model</th><th></th></tr></thead>
+              <tbody id="evalbody"></tbody>
+            </table>
+            <p class="stat" style="margin-top:12px">Lower is better (mean absolute % error). "Held-out" jobs were never seen during training.</p>
+          </div>
+          <div class="card">
+            <h2 class="serif">Markets &amp; demand</h2>
+            <div class="stat" id="dstats"></div>
+            <div id="markets" style="margin-top:10px"></div>
+            <table style="margin-top:8px"><tbody id="catbody"></tbody></table>
+          </div>
+          <div class="card full">
+            <h2 class="serif">Recent jobs — baseline vs our model vs what it actually cost</h2>
+            <table>
+              <thead><tr><th>Category</th><th>Job</th><th class="num">Baseline</th><th class="num">Model</th><th class="num">Actual</th><th class="num">Conf.</th></tr></thead>
+              <tbody id="samplebody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <footer>HouseAccount AI Pricing Model · estimates run in your browser; bookings are stored locally for this demo.</footer>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <script type="module">
+      import { predictWithModel } from './predict_core.js';
+      import { oodFlags } from './calibration.js';
+      import { normalizeCategory } from './features.js';
+      import { clarifyingGuidance } from './clarify.js';
+
+      const money = (n) => '$' + Math.round(n).toLocaleString();
+      const $ = (id) => document.getElementById(id);
+      const BOOKINGS_KEY = 'houseaccount_bookings';
+
+      const [model, summary, evalReport, samples, markets, providers] = await Promise.all([
+        fetch('./model.json').then((r) => r.json()),
+        fetch('./data_summary.json').then((r) => r.json()),
+        fetch('./eval_report.json').then((r) => r.json()),
+        fetch('./sample_rows.json').then((r) => r.json()),
+        fetch('./markets.json').then((r) => r.json()),
+        fetch('./providers.json').then((r) => r.json()),
+      ]);
+
+      const state = { estimate: null, rec: null, market: null, zip: null, provider: null };
+
+
+      // market + zip selectors
+      const marketSel = $('market'), zipSel = $('zip');
+      markets.forEach((m) => marketSel.append(new Option(m.name, m.name)));
+      function fillZips() {
+        zipSel.innerHTML = '';
+        const m = markets.find((x) => x.name === marketSel.value);
+        m.zips.forEach((z) => zipSel.append(new Option(z, z)));
+      }
+      marketSel.addEventListener('change', fillZips);
+      fillZips();
+
+      for (const c of model.spec.category_vocab) {
+        const o = new Option(c, c); if (c === 'Plumbing') o.selected = true; $('category').append(o);
+      }
+
+      function readForm() {
+        const num = (id) => ($(id).value === '' ? null : Number($(id).value));
+        return {
+          job_id: 'ui-' + Date.now(), service_category: $('category').value,
+          zip_code: zipSel.value, booking_month: $('month').value,
+          job_description: $('desc').value, deadline: $('deadline').value,
+          original_estimate: num('orig'), original_estimate_lo: num('lo'), original_estimate_hi: num('hi'),
+        };
+      }
+      function trustOf(c) {
+        if (c >= 0.75) return { label: 'High confidence', color: 'var(--good)' };
+        if (c >= 0.5) return { label: 'Good estimate', color: 'var(--ok)' };
+        return { label: "We'll have a pro confirm", color: 'var(--soft)' };
+      }
+
+      let priceAnim;
+      function showPrice(el, to) {
+        cancelAnimationFrame(priceAnim);
+        const dur = 460, t0 = performance.now();
+        const step = (t) => {
+          const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+          el.textContent = money(to * e);
+          if (k < 1) priceAnim = requestAnimationFrame(step); else el.textContent = money(to);
+        };
+        priceAnim = requestAnimationFrame(step);
+      }
+
+      function estimate() {
+        const rec = readForm();
+        const out = predictWithModel(rec, model);
+        state.estimate = out; state.rec = rec; state.market = marketSel.value; state.zip = zipSel.value;
+        const flags = oodFlags(out.estimate_midpoint, out.estimate_lo, out.estimate_hi,
+          normalizeCategory(rec.service_category), model.median_predicted_interval);
+        $('result').hidden = false;
+        showPrice($('mid'), out.estimate_midpoint);
+        $('range').textContent = `typical range ${money(out.estimate_lo)} – ${money(out.estimate_hi)}`;
+        const t = trustOf(out.confidence);
+        $('confbar').style.width = Math.round(out.confidence * 100) + '%';
+        $('confbar').style.background = t.color;
+        $('trustlabel').textContent = t.label; $('trustlabel').style.color = t.color;
+        $('confval').textContent = out.confidence.toFixed(2);
+        $('ver').textContent = out.model_version;
+        const chips = [flags.any
+          ? '<span class="chip flag">Unusual job — routed to a specialist</span>'
+          : '<span class="chip good">Confident match</span>'];
+        if (flags.price) chips.push('<span class="chip flag">large job (&gt; $5k)</span>');
+        if (flags.interval) chips.push('<span class="chip flag">wide price range</span>');
+        if (flags.category) chips.push('<span class="chip flag">newer service category</span>');
+        $('badges').innerHTML = chips.join('');
+        const g = clarifyingGuidance(rec, out);
+        if (g.note || g.questions.length) {
+          $('ask').hidden = false;
+          $('ask').innerHTML = (g.note ? `<div class="note">${g.note}</div>` : '') +
+            (g.questions.length ? '<div class="h">A few quick questions to sharpen this</div><ul>' +
+              g.questions.map((q) => `<li>${q}</li>`).join('') + '</ul>' : '');
+        } else $('ask').hidden = true;
+      }
+      $('go').addEventListener('click', estimate);
+
+      // ---- views ----
+      function show(view) {
+        for (const v of ['estimate', 'providers', 'confirm']) $('view-' + v).hidden = v !== view;
+        if (view !== 'estimate') window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      $('back-estimate').onclick = () => show('estimate');
+      $('back-providers').onclick = () => show('providers');
+
+      function providerPrice(p) { return Math.round(state.estimate.estimate_midpoint * p.price_factor); }
+
+      function openProviders() {
+        const list = (providers[state.market] || []).map((p) => ({ ...p, price: providerPrice(p) }));
+        const minPrice = Math.min(...list.map((p) => p.price));
+        const maxRating = Math.max(...list.map((p) => p.rating));
+        $('opt-where').textContent = `${state.rec.service_category} · ${state.market} ${state.zip}`;
+        $('opts').innerHTML = list.map((p, i) => {
+          let tag = '<span class="tag tag-none">.</span>';
+          if (p.price === minPrice) tag = '<span class="tag tag-value">Best value</span>';
+          else if (p.rating === maxRating) tag = '<span class="tag tag-top">Top rated</span>';
+          return `<div class="opt">
+            ${tag}
+            <div class="name">${p.name}</div>
+            <div class="meta">★ ${p.rating.toFixed(1)} · ${p.reviews} reviews</div>
+            <div class="p">${money(p.price)}</div>
+            <div class="eta">Earliest: in ${p.eta_days} day${p.eta_days > 1 ? 's' : ''}</div>
+            <button class="btn btn-primary" data-i="${i}">Select</button>
+          </div>`;
+        }).join('');
+        $('opts').querySelectorAll('button[data-i]').forEach((b) =>
+          b.addEventListener('click', () => chooseProvider(list[Number(b.dataset.i)])));
+        show('providers');
+      }
+      $('toproviders').addEventListener('click', openProviders);
+
+      function chooseProvider(p) {
+        state.provider = p;
+        $('confirm-summary').innerHTML = `
+          <div class="r"><span class="k">Service</span><span class="v">${state.rec.service_category}</span></div>
+          <div class="r"><span class="k">Where</span><span class="v">${state.market} · ${state.zip}</span></div>
+          <div class="r"><span class="k">When</span><span class="v">${state.rec.deadline}</span></div>
+          <div class="r"><span class="k">Provider</span><span class="v">${p.name} · ★ ${p.rating.toFixed(1)}</span></div>
+          <div class="r"><span class="k">Earliest</span><span class="v">in ${p.eta_days} day${p.eta_days > 1 ? 's' : ''}</span></div>
+          <div class="r total"><span class="k">Price</span><span class="v">${money(p.price)}</span></div>`;
+        $('c-mid').textContent = money(state.estimate.estimate_midpoint);
+        $('c-range').textContent = `typical range ${money(state.estimate.estimate_lo)} – ${money(state.estimate.estimate_hi)}`;
+        show('confirm');
+      }
+
+      function loadBookings() { try { return JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || []; } catch { return []; } }
+      function saveBookings(b) { localStorage.setItem(BOOKINGS_KEY, JSON.stringify(b)); }
+
+      function complete(kind) {
+        const p = state.provider;
+        const order = {
+          id: 'HA-' + Date.now().toString(36).toUpperCase(),
+          when: new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+          kind, category: state.rec.service_category, market: state.market, zip: state.zip,
+          provider: p.name, rating: p.rating, price: p.price, eta_days: p.eta_days,
+        };
+        const all = loadBookings(); all.unshift(order); saveBookings(all);
+        renderBookings();
+        toast(kind === 'Booking' ? `Booked ${p.name} · ${money(p.price)}` : `Enquiry sent to ${p.name}`);
+        show('estimate');
+        document.querySelector('.bookings').scrollIntoView({ behavior: 'smooth' });
+      }
+      $('checkout').addEventListener('click', () => complete('Booking'));
+      $('enquiry').addEventListener('click', () => complete('Enquiry'));
+
+      function renderBookings() {
+        const all = loadBookings();
+        if (!all.length) { $('bookings-list').innerHTML = '<div class="empty">No bookings yet — get an estimate and choose a provider to start.</div>'; return; }
+        $('bookings-list').innerHTML = all.map((o) => {
+          const st = o.kind === 'Booking'
+            ? '<span class="status st-book">Confirmed</span>'
+            : '<span class="status st-enq">Enquiry sent</span>';
+          return `<div class="bk">
+            <div>
+              <div class="who">${o.provider} ${st}</div>
+              <div class="sub">${o.category} · ${o.market} ${o.zip} · ${o.id} · ${o.when}</div>
+            </div>
+            <div class="right"><div class="amt">${money(o.price)}</div><div class="sub">in ${o.eta_days} day${o.eta_days > 1 ? 's' : ''}</div></div>
+          </div>`;
+        }).join('');
+      }
+
+      let toastT;
+      function toast(msg) {
+        const el = $('toast'); el.textContent = msg; el.classList.add('show');
+        clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 2600);
+      }
+
+      // ---- behind the model ----
+      $('evalnote').textContent = '';
+      $('evalbody').innerHTML = evalReport.map((r) => `
+        <tr><td>${r.label}</td><td class="num">${r.n}</td><td class="num">${r.baseline_mape}%</td>
+        <td class="num"><b>${r.model_mape}%</b></td><td class="${r.beats ? 'beats' : ''}">${r.beats ? '✓ beats' : '—'}</td></tr>`).join('');
+      $('dstats').innerHTML =
+        `<b>${summary.rows.toLocaleString()}</b> jobs · ${summary.priced} priced · baseline error ${summary.baseline_blended_mape}%`;
+      const mkColors = ['var(--teal)', 'var(--terra)', 'var(--gold)'];
+      $('markets').innerHTML = (summary.markets || []).map((m, i) =>
+        `<span class="mk"><span class="dot" style="background:${mkColors[i % 3]}"></span>${m.name.split(',')[0]} <b>${Math.round(m.count / summary.priced * 100)}%</b></span>`).join('');
+      const maxCount = Math.max(...summary.categories.map((c) => c.count));
+      $('catbody').innerHTML = summary.categories.slice(0, 8).map((c) => `
+        <tr><td style="width:120px">${c.name}</td><td><div class="bar-mini" style="width:${(c.count / maxCount) * 100}%"></div></td>
+        <td class="num" style="width:34px">${c.count}</td></tr>`).join('');
+      $('samplebody').innerHTML = samples.map((s) => `
+        <tr><td>${s.category}<div class="submk">${s.market}</div></td><td class="muted">${s.description}</td>
+        <td class="num">${money(s.original_estimate)}</td><td class="num"><b>${money(s.model_midpoint)}</b></td>
+        <td class="num">${money(s.final_price)}</td><td class="num">${s.confidence.toFixed(2)}</td></tr>`).join('');
+
+      renderBookings();
+      estimate();
+    </script>
+  </body>
+</html>

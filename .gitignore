@@ -23,3 +23,6 @@ frontend/dist/
 # Generated artifacts (regenerable)
 *.pdf
 diagrams/screenshots/
+
+# design handoff archive (folder is committed; zip is redundant)
+pricing-model/HouseAccount Services SKUs Design.zip

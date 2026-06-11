@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Opt-in: enable with `git config core.hooksPath pricing-model/.githooks` (from repo root).
+# Runs the fast unit suites before each commit so the repo stays green.
+set -e
+HERE="$(cd "$(dirname "$0")/.." && pwd)"   # -> pricing-model
+cd "$HERE"
+echo "[pre-commit] pytest..."
+python -m pytest -q
+echo "[pre-commit] node tests..."
+node --test "functions/__tests__/"*.test.mjs
+echo "[pre-commit] all green"

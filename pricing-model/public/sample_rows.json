@@ -1,0 +1,134 @@
+[
+  {
+    "job_id": "synthetic-",
+    "category": "Electrical",
+    "zip": "10023",
+    "market": "New York, NY",
+    "description": "Install 4 outlets or switches",
+    "original_estimate": 621.0,
+    "final_price": 511.0,
+    "model_midpoint": 615.0,
+    "confidence": 0.78
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Plumbing",
+    "zip": "75201",
+    "market": "Dallas, TX",
+    "description": "Replace 5 plumbing fixtures",
+    "original_estimate": 330.0,
+    "final_price": 473.0,
+    "model_midpoint": 376.0,
+    "confidence": 0.83
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Cleaning",
+    "zip": "95014",
+    "market": "SF Bay Area, CA",
+    "description": "Standard home cleaning, 4 rooms",
+    "original_estimate": 304.0,
+    "final_price": 307.0,
+    "model_midpoint": 304.0,
+    "confidence": 0.79
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Electrical",
+    "zip": "75007",
+    "market": "Dallas, TX",
+    "description": "Install 2 outlets or switches",
+    "original_estimate": 407.0,
+    "final_price": 335.0,
+    "model_midpoint": 363.0,
+    "confidence": 0.8
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Remodeling",
+    "zip": "75201",
+    "market": "Dallas, TX",
+    "description": "Remodel 1 rooms",
+    "original_estimate": 6343.0,
+    "final_price": 6398.0,
+    "model_midpoint": 5501.0,
+    "confidence": 0.1
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "HVAC",
+    "zip": "75007",
+    "market": "Dallas, TX",
+    "description": "Service 3 HVAC unit(s), you supply materials",
+    "original_estimate": 920.0,
+    "final_price": 847.0,
+    "model_midpoint": 862.0,
+    "confidence": 0.83
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Exterior",
+    "zip": "75007",
+    "market": "Dallas, TX",
+    "description": "Power wash 4 exterior surfaces, you supply materials",
+    "original_estimate": 667.0,
+    "final_price": 615.0,
+    "model_midpoint": 613.0,
+    "confidence": 0.85
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Pest Control",
+    "zip": "95014",
+    "market": "SF Bay Area, CA",
+    "description": "Pest treatment for a 6BR home",
+    "original_estimate": 922.0,
+    "final_price": 1104.0,
+    "model_midpoint": 1076.0,
+    "confidence": 0.83
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Plumbing",
+    "zip": "95014",
+    "market": "SF Bay Area, CA",
+    "description": "Replace 1 plumbing fixtures",
+    "original_estimate": 531.0,
+    "final_price": 404.0,
+    "model_midpoint": 439.0,
+    "confidence": 0.81
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Chimney",
+    "zip": "11201",
+    "market": "New York, NY",
+    "description": "Inspect and sweep 1 chimney(s)",
+    "original_estimate": 786.0,
+    "final_price": 776.0,
+    "model_midpoint": 715.0,
+    "confidence": 0.41
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Cleaning",
+    "zip": "75201",
+    "market": "Dallas, TX",
+    "description": "Standard home cleaning, 6 rooms",
+    "original_estimate": 200.0,
+    "final_price": 232.0,
+    "model_midpoint": 217.0,
+    "confidence": 0.8
+  },
+  {
+    "job_id": "synthetic-",
+    "category": "Exterior",
+    "zip": "75007",
+    "market": "Dallas, TX",
+    "description": "Power wash 3 exterior surfaces",
+    "original_estimate": 647.0,
+    "final_price": 621.0,
+    "model_midpoint": 650.0,
+    "confidence": 0.82
+  }
+]

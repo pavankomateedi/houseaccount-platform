@@ -1,0 +1,101 @@
+{
+  "synthetic": true,
+  "model_version": "pavan-v1.0.0-synthetic",
+  "rows": 1432,
+  "priced": 411,
+  "unique_zips": 6,
+  "markets": [
+    {
+      "name": "Dallas, TX",
+      "count": 157
+    },
+    {
+      "name": "New York, NY",
+      "count": 153
+    },
+    {
+      "name": "SF Bay Area, CA",
+      "count": 101
+    }
+  ],
+  "categories": [
+    {
+      "name": "Handyman",
+      "count": 47
+    },
+    {
+      "name": "Plumbing",
+      "count": 46
+    },
+    {
+      "name": "Cleaning",
+      "count": 42
+    },
+    {
+      "name": "Pest Control",
+      "count": 37
+    },
+    {
+      "name": "Electrical",
+      "count": 32
+    },
+    {
+      "name": "Exterior",
+      "count": 31
+    },
+    {
+      "name": "Appliance Repair",
+      "count": 31
+    },
+    {
+      "name": "Landscaping",
+      "count": 29
+    },
+    {
+      "name": "Painting",
+      "count": 28
+    },
+    {
+      "name": "HVAC",
+      "count": 18
+    },
+    {
+      "name": "Moving",
+      "count": 12
+    },
+    {
+      "name": "Chimney",
+      "count": 11
+    },
+    {
+      "name": "Auto",
+      "count": 11
+    },
+    {
+      "name": "General Contractor",
+      "count": 10
+    },
+    {
+      "name": "Flooring",
+      "count": 10
+    },
+    {
+      "name": "Remodeling",
+      "count": 7
+    },
+    {
+      "name": "Pool",
+      "count": 5
+    },
+    {
+      "name": "Roofing",
+      "count": 4
+    }
+  ],
+  "midpoint_p50": 575.0,
+  "midpoint_p90": 1940.0,
+  "midpoint_p95": 3944.0,
+  "baseline_blended_mape": 14.65,
+  "baseline_median_ape": 12.31,
+  "median_interval": 154.0
+}

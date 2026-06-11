@@ -1,0 +1,67 @@
+{
+  "description": "HTTP contract conformance cases for the Netlify endpoint (Appendix A). 'auth' is resolved by the test runner to a header: valid -> correct bearer, wrong -> bad token, none -> no header. Validation order under test: method -> auth -> JSON parse -> required fields.",
+  "valid_body": {
+    "job_id": "abc123",
+    "service_category": "Plumbing",
+    "service_subtype": "Water Heater Replacement",
+    "zip_code": "78704",
+    "job_description": "50-gallon gas water heater stopped working, pilot won't stay lit. Need replacement.",
+    "deadline": "Within 1-2 weeks",
+    "booking_month": "2026-05",
+    "original_estimate": 1850,
+    "original_estimate_lo": 1400,
+    "original_estimate_hi": 2300
+  },
+  "cases": [
+    {
+      "name": "non-POST method is rejected",
+      "method": "GET", "auth": "valid", "body": "valid",
+      "expect": { "status": 405, "error": "Method not allowed" }
+    },
+    {
+      "name": "missing Authorization header is unauthorized",
+      "method": "POST", "auth": "none", "body": "valid",
+      "expect": { "status": 401, "error": "Unauthorized" }
+    },
+    {
+      "name": "wrong bearer secret is unauthorized",
+      "method": "POST", "auth": "wrong", "body": "valid",
+      "expect": { "status": 401, "error": "Unauthorized" }
+    },
+    {
+      "name": "malformed JSON body is rejected",
+      "method": "POST", "auth": "valid", "raw_body": "{ not json",
+      "expect": { "status": 400, "error": "Malformed JSON" }
+    },
+    {
+      "name": "missing job_id is rejected with field name",
+      "method": "POST", "auth": "valid", "omit": "job_id",
+      "expect": { "status": 400, "error": "job_id required" }
+    },
+    {
+      "name": "missing service_category is rejected with field name",
+      "method": "POST", "auth": "valid", "omit": "service_category",
+      "expect": { "status": 400, "error": "service_category required" }
+    },
+    {
+      "name": "missing zip_code is rejected with field name",
+      "method": "POST", "auth": "valid", "omit": "zip_code",
+      "expect": { "status": 400, "error": "zip_code required" }
+    },
+    {
+      "name": "missing job_description is rejected with field name",
+      "method": "POST", "auth": "valid", "omit": "job_description",
+      "expect": { "status": 400, "error": "job_description required" }
+    },
+    {
+      "name": "blank required field is rejected",
+      "method": "POST", "auth": "valid", "override": { "service_category": "" },
+      "expect": { "status": 400, "error": "service_category required" }
+    },
+    {
+      "name": "valid request returns a schema-conformant estimate",
+      "method": "POST", "auth": "valid", "body": "valid",
+      "expect": { "status": 200, "ok": true, "schema": "response", "echo_job_id": "abc123" }
+    }
+  ]
+}

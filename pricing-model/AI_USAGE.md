@@ -1,159 +1,96 @@
-# AI Usage Documentation
+# AI Usage
 
-## Tools Used
+How AI tooling was used to build this project, per the brief's template.
 
-### 1. Claude Code (Haiku 4.5)
-**Role:** Architecture design, code generation, testing
-- Initial plan: designed 5-phase implementation strategy
-- Code scaffolding: generated Python modules for data pipeline, model training, API layer
-- Architecture review: refined feature extraction strategy
-- Test generation: created unit tests for model training, confidence calibration, API contract
+## Tools used
 
-### 2. Claude API (Opus 4.7)
-**Role:** Scope extraction from job descriptions
-- Batch extracts key features (complexity, fixtures, materials) from unstructured text
-- Implements production-ready prompt with JSON response validation
-- ~500ms latency per description (cached in production)
+- **Claude Code (Claude Opus 4.8)** — the primary coding agent for the entire
+  build: planning, code generation, refactoring, test authoring, debugging, and
+  building the validation UI. Operated against a set of repo coding rules
+  (clean-architecture / clean-code / simplicity-first / testing-python) loaded at
+  session start.
+- **Playwright (driven by the agent)** — headless browser verification of the
+  validation UI (rendering, in-browser inference, OOD flags, clarifying questions).
+- **scikit-learn / pandas / numpy** — the modeling stack (not AI, but the agent
+  chose and wired them). `QuantileRegressor` for the quantile-linear model.
 
-### 3. scikit-learn & pandas
-**Role:** Model training & data processing
-- Ridge regression for baseline (fast, interpretable)
-- StandardScaler for feature normalization
-- Not AI, but core to reproducible pipelines
+Notably, **no LLM is used at request time** — scope extraction is deterministic
+regex, so inference is free, fast, and reproducible. AI was a build-time tool,
+not a runtime dependency.
 
----
+## Significant prompts (the ones that shaped the architecture)
 
-## Significant Prompts (5-10 key ones)
+1. **"Build to the requirements; start with goldenset, evals, harness, JSON, and
+   tools, then code."** Set the order: build the verification harness and contract
+   first, then iterate the model against measured results.
+2. **"Did the requirement say they will provide the data?"** Forced an honest read
+   of the brief — the dataset is a provided input and the eval basis — which led
+   to the rule *never fabricate training/eval data* and the synthetic-data guard.
+3. **Architecture decision prompt (agent-posed, user-chosen):** Node-only Netlify
+   function (train in Python, export to JSON, infer in JS) + tabular ML with
+   text features. This drove the linear (JSON-portable) model and the
+   Python<->JS parity design.
+4. **"Make up synthetic data ... and ignore the API integration for now."** Led to
+   a realistic generator that reproduces the brief's baseline structure, plus the
+   `--allow-synthetic` guard so fake numbers can never pose as real.
+5. **"I'd like a UI to validate/see the data."** Produced the browser console that
+   reuses the exact tested inference modules (no reimplementation).
+6. **"More data for quick chores vs major appliances, and ask clarifying questions
+   with each estimate."** Reweighted the generator toward quick chores and added
+   the tested `clarify.js` question engine (kept in the UI, not the locked API
+   response).
 
-### Prompt 1: Architecture Planning
-**Objective:** Design end-to-end system for pricing estimates
-**Key request:** "Design a system that beats 11.6% MAPE baseline, handles OOD detection, and integrates with HouseAccount's booking flow"
-**Outcome:** 5-phase plan (explore → train → API → test → deploy) with identified tradeoffs (Netlify + Python model vs monolith)
+The single most important *technical* pivot the agent made: switching the model
+target to the **log-ratio of price to the baseline estimate** after the harness
+showed a from-scratch model couldn't beat a strong baseline.
 
-### Prompt 2: Feature Engineering Strategy
-**Objective:** Decide how to handle job descriptions (no scope fields provided)
-**Key request:** "How should we extract scope signals from free-text descriptions? Consider regex vs Claude API"
-**Outcome:** Claude API chosen for reliability; Ridge regression selected for speed (vs XGBoost complexity)
+## Validation steps for AI-generated code
 
-### Prompt 3: Scope Extraction Prompt (Claude API)
-**Objective:** Extract structured features from descriptions
-**Content:**
-```
-Extract scope features from this job description for pricing estimation.
-Job description: "{description}"
+- **Automated tests** — 52 pytest (metrics, data + synthetic guard, features,
+  model pipeline, calibration invariants) and 35 Node tests (HTTP contract,
+  calibration golden parity, Python<->JS feature parity, edge/OOD, clarify). Run
+  via `pytest` and `npm test`.
+- **Cross-runtime parity** — shared golden cases and a feature-parity fixture
+  assert the JS endpoint and Python model compute identically.
+- **Eval gate** — `eval/run_eval.py` exits non-zero unless the model beats
+  baseline; it refuses synthetic data unless explicitly allowed.
+- **UI verification** — Playwright confirmed the page renders with no JS errors
+  and that OOD inputs produce low confidence + the expected flags.
 
-Return JSON with: complexity (low/medium/high), scope_size, materials_provided, urgency, fixtures_count
-Be concise. Return only valid JSON.
-```
-**Outcome:** Reliable extraction; handles edge cases (null values, missing info)
+### Hallucinations / bad output caught and fixed
 
-### Prompt 4: Confidence Calibration Design
-**Objective:** Implement OOD detection per spec
-**Key request:** "Design confidence calibration that drops <0.5 for OOD inputs: high prices (>$5K), wide intervals (>3× median), non-production categories"
-**Outcome:** Multiplicative penalty formula: base × cat_penalty × price_penalty × interval_penalty
-
-### Prompt 5: Test Generation
-**Objective:** Create comprehensive test suite
-**Key request:** "Generate unit tests for feature extraction, model training (verify MAPE < 11.6%), and OOD confidence calibration"
-**Outcome:** 10-test suite covering all critical paths; all passing
-
-### Prompt 6: Netlify Function Template
-**Objective:** Build API endpoint following HouseAccount conventions
-**Key request:** "Create a Netlify function that validates Bearer tokens (timingSafeEqual), returns proper error codes (400/401/405), and matches the response schema"
-**Outcome:** Function with auth validation, request schema checking, error handling
-
-### Prompt 7: Data Generation (Synthetic)
-**Objective:** Create realistic 1,432-row dataset for development
-**Key request:** "Generate pricing dataset with 18 categories, 1,033 ZIPs, realistic price distributions, 19% label rate"
-**Outcome:** Reproducible synthetic data; baseline MAPE ~10.6% (beats target)
-
-### Prompt 8: Documentation (README + MODELING_APPROACH)
-**Objective:** Create clear, actionable docs
-**Key request:** "Write a README and modeling approach doc that a new engineer can understand in 15 minutes"
-**Outcome:** 2-doc set with architecture diagram, quick-start, feature explanation, confidence formula
-
----
-
-## Validation Steps for AI-Generated Code
-
-### 1. Feature Extraction Tests
-- ✓ Test that Claude scope extraction returns valid JSON
-- ✓ Test fallback handling (null on error)
-- ✓ Verify caching prevents duplicate API calls
-- ✓ Manual spot-check: "Replace water heater" → complexity="medium", scope_size="medium"
-
-### 2. Model Training Tests
-- ✓ Ridge regression trains without errors
-- ✓ MAPE computed correctly against test set
-- ✓ Model serialization (pickle save/load) works
-- ✓ Feature scaling applied (StandardScaler verifies)
-- ✓ Log transform on target reduces outlier impact
-
-### 3. Confidence Calibration Tests
-- ✓ Base confidence = 0.8 for production jobs
-- ✓ Non-production category → confidence < 0.8
-- ✓ High price (>$5K) → confidence < 0.8
-- ✓ Wide interval → confidence < 0.8
-- ✓ All OOD signals combined → confidence < 0.5
-
-### 4. API Contract Tests
-- ✓ Missing required field (job_id) → 400 "job_id required"
-- ✓ Invalid auth → 401 "Unauthorized"
-- ✓ Non-POST method → 405 "Method not allowed"
-- ✓ Response includes all required fields (ok, job_id, estimate_lo/hi, midpoint, confidence, model_version)
-- ✓ Confidence always ∈ [0, 1]
-
-### 5. End-to-End Integration
-- ✓ Trained model saved to disk
-- ✓ Model loaded successfully
-- ✓ Inference on sample data returns predictions
-- ✓ Predictions reasonable (within historical range)
-- ✓ <2s total latency (feature extraction + inference)
-
-### Hallucinations Caught & Fixed
-
-1. **Initial feature set too large:** Claude generated 50+ categorical features; reduced to 27 key ones for interpretability and training stability
-2. **Confidence formula too complex:** First attempt had nested conditionals; simplified to multiplicative penalties
-3. **Missing env var validation:** Generated code without checking GAUNTLET_PRICING_SECRET on startup; added boot-time throw
-4. **Scope extraction error handling:** Initial prompt didn't handle JSON parse errors; added fallback to empty dict
-
----
+1. **Prior build was trained on synthetic data and the endpoint returned
+   `Math.random()`.** Caught on first read; the whole thing was rebuilt and a
+   synthetic-data guard added so it can't recur silently.
+2. **`mape` used `if not predicted:`** — ambiguous on numpy arrays; the harness
+   crashed. Fixed to a length check and added an array regression test.
+3. **`is_synthetic` returned `numpy.bool_`** instead of Python `bool`; caught by a
+   strict `is True` test.
+4. **First synthetic generator encoded the price signal as a per-template
+   *normalized* value the model couldn't recover from raw features** — the task
+   was unlearnable, so the model couldn't beat baseline. Rewritten so the signal
+   is a clean function of the actual extracted features.
+5. **Request payloads use `original_estimate_lo/hi`, not `estimate_lo/hi`** — the
+   feature resolver was dropping request bounds; fixed in both languages with tests.
+6. **The UI's prefilled example was out-of-distribution for the synthetic model**
+   (a realistic $1,850 water heater vs synthetic Plumbing ~$350), producing a weird
+   low-confidence result; aligned the demo input to the data.
 
 ## Reflection
 
-### Where AI Helped Most
+**Where AI helped most.** Standing up the full layered architecture, the
+verification harness, and the Python<->JS parity machinery quickly; and relentless
+test-writing that caught real bugs (numpy truthiness, bool typing, the request
+field mismatch). The agent was also good at *refusing to proceed dishonestly* —
+flagging the synthetic-data trap and building guards instead of papering over it.
 
-1. **Architecture Design:** Initial plan saved 2-3 hours; broke problem into manageable phases
-2. **Code Scaffolding:** Generated core pipeline modules; 70% of final code came from AI (Ridge model, feature encoding, API contract)
-3. **Test Generation:** Full test suite written by AI; caught logical bugs before manual testing
-4. **Documentation:** README + MODELING_APPROACH written by AI; clear enough for peer review
+**Where AI produced bad output.** It needed several iterations to design synthetic
+data that was both realistic *and* learnable (first version unlearnable, second
+made the baseline implausibly bad). Left unchecked, an agent will happily generate
+plausible-but-meaningless numbers — exactly what the previous build shipped.
 
-### Where AI Produced Bad Output
-
-1. **Feature Engineering:** First attempt used complex scope extraction (sentence embedding); simplified to heuristic + Claude API
-2. **Confidence Calibration:** Initial formula had "if/else" cascade; changed to multiplicative penalties (cleaner, more interpretable)
-3. **API Error Messages:** Generated inconsistent error formats; standardized to `{"error": "message"}` per spec
-4. **Serialization:** First pickle attempt had sklearn version issues; handled with explicit dtype control
-
-### What I'd Do Differently Next Time
-
-1. **Spend more time on prompt quality:** 2-3 revisions per major component would reduce hallucinations
-2. **Generate tests first, then code:** Test-driven generation (AI writes test specs, then code) would catch more bugs
-3. **Manual review of generated code:** ~30 min per 500 LOC to catch edge cases (error handling, bounds checking)
-4. **Version models explicitly:** Add model version to predictions + log prompts used (for reproducibility)
-5. **Separate concerns earlier:** Keep feature extraction, training, and serving in distinct modules from the start (easier to test + iterate)
-
----
-
-## Summary
-
-**AI tool effectiveness: 8/10**
-- Enabled 3-day delivery timeline (would've taken 1-2 weeks manually)
-- Generated working code for 70% of implementation
-- Caught logical errors through test generation
-- Required ~20% manual validation + refinement
-
-**Recommendation for hiring signal:**
-- Shows ability to use AI agents for end-to-end architecture (plan → code → test)
-- Demonstrates judgment on where AI helps vs where manual work is needed
-- Validates AI output before shipping (rigorous testing)
+**What I'd do differently.** Establish the "real data only for eval, synthetic is
+dev-only and must be labeled" rule on day one. Define the verification harness and
+the metric before writing any model code (the brief's own instinct, and it paid
+off). And treat any "we beat the baseline" claim as false until a held-out gate
+says so on real data.

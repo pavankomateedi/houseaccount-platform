@@ -1,0 +1,57 @@
+{
+  "description": "End-to-end robustness/OOD request cases driven through the live handler with valid auth. Confirms the contract's 'pass OOD through with low confidence, never reject' rule and input normalization. expect: status, ok, confidence_max/min, valid_shape.",
+  "cases": [
+    {
+      "name": "non-production category passes through with low confidence",
+      "body": {
+        "job_id": "edge-roofing",
+        "service_category": "Roofing",
+        "zip_code": "90210",
+        "job_description": "Full roof replacement, 1800 sqft"
+      },
+      "expect": { "status": 200, "ok": true, "valid_shape": true, "confidence_max": 0.5 }
+    },
+    {
+      "name": "unknown category is not rejected, returns a low-confidence estimate",
+      "body": {
+        "job_id": "edge-unknown",
+        "service_category": "Underwater Basket Weaving",
+        "zip_code": "90210",
+        "job_description": "Weave a wicker basket underwater"
+      },
+      "expect": { "status": 200, "ok": true, "valid_shape": true, "confidence_max": 0.5 }
+    },
+    {
+      "name": "minimal required-only request returns a valid estimate via spec defaults",
+      "body": {
+        "job_id": "edge-minimal",
+        "service_category": "Plumbing",
+        "zip_code": "78704",
+        "job_description": "Fix leaky bathroom faucet"
+      },
+      "expect": { "status": 200, "ok": true, "valid_shape": true }
+    },
+    {
+      "name": "kebab-case production category is normalized and accepted",
+      "body": {
+        "job_id": "edge-kebab",
+        "service_category": "pest-control",
+        "zip_code": "33324",
+        "job_description": "General pest control service"
+      },
+      "expect": { "status": 200, "ok": true, "valid_shape": true }
+    },
+    {
+      "name": "extra and unknown fields are ignored, not errors",
+      "body": {
+        "job_id": "edge-extra",
+        "service_category": "Cleaning",
+        "zip_code": "75062",
+        "job_description": "Deep clean kitchen and bathrooms",
+        "job_status": "new",
+        "totally_unknown_field": 42
+      },
+      "expect": { "status": 200, "ok": true, "valid_shape": true }
+    }
+  ]
+}

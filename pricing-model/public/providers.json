@@ -1,0 +1,71 @@
+{
+  "New York, NY": [
+    {
+      "name": "Empire Home Pros",
+      "rating": 4.9,
+      "reviews": 412,
+      "price_factor": 1.12,
+      "eta_days": 2
+    },
+    {
+      "name": "Five Boroughs Services",
+      "rating": 4.7,
+      "reviews": 286,
+      "price_factor": 1.0,
+      "eta_days": 3
+    },
+    {
+      "name": "Hudson Handywork",
+      "rating": 4.6,
+      "reviews": 158,
+      "price_factor": 0.91,
+      "eta_days": 5
+    }
+  ],
+  "Dallas, TX": [
+    {
+      "name": "Lone Star Home Services",
+      "rating": 4.8,
+      "reviews": 503,
+      "price_factor": 1.08,
+      "eta_days": 1
+    },
+    {
+      "name": "Trinity Trades",
+      "rating": 4.7,
+      "reviews": 221,
+      "price_factor": 0.98,
+      "eta_days": 2
+    },
+    {
+      "name": "Big D Dependable",
+      "rating": 4.5,
+      "reviews": 97,
+      "price_factor": 0.88,
+      "eta_days": 4
+    }
+  ],
+  "SF Bay Area, CA": [
+    {
+      "name": "Golden Gate Home Collective",
+      "rating": 4.9,
+      "reviews": 367,
+      "price_factor": 1.15,
+      "eta_days": 2
+    },
+    {
+      "name": "Peninsula Pros",
+      "rating": 4.8,
+      "reviews": 244,
+      "price_factor": 1.03,
+      "eta_days": 3
+    },
+    {
+      "name": "Bay Area Fixers",
+      "rating": 4.6,
+      "reviews": 132,
+      "price_factor": 0.93,
+      "eta_days": 5
+    }
+  ]
+}

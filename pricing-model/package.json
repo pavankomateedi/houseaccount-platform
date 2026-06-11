@@ -1,15 +1,15 @@
 {
   "name": "houseaccount-pricing-model",
   "version": "1.0.0",
-  "description": "AI pricing estimator for HouseAccount",
+  "description": "AI pricing estimator + services storefront for HouseAccount",
   "main": "functions/pricing-estimate.js",
   "type": "module",
   "scripts": {
+    "test": "node --test \"functions/__tests__/*.test.mjs\"",
+    "build:ui": "python eval/export_ui.py --data data/pricing_synthetic.csv --allow-synthetic",
+    "serve": "python -m http.server 8787 --directory public",
     "dev": "netlify dev",
     "deploy": "netlify deploy"
-  },
-  "dependencies": {
-    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@netlify/functions": "^2.0.0"

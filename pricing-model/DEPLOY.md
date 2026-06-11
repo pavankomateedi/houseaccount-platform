@@ -1,191 +1,117 @@
 # Deployment Guide
 
-## Local Development
+## Prerequisites
 
-### Prerequisites
-- Python 3.12+
-- Node.js 18+
-- Netlify CLI (optional)
+- Python 3.11+
+- Node.js 18+ (developed on 24)
+- Netlify CLI (optional, for local serving / deploy)
 
-### Setup
+## Local setup
 
 ```bash
-# Clone repository
-git clone <repo-url>
 cd pricing-model
-
-# Create Python virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install Python dependencies
+python -m venv .venv && . .venv/Scripts/activate    # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-
-# Install Node dependencies (for Netlify functions)
 npm install
 ```
 
-### Training the Model
+## Build the model artifact
+
+The endpoint serves predictions from `functions/model.json`. Produce it with the
+eval gate (it writes the artifact only on a passing run).
 
 ```bash
-# Generate synthetic data (if needed)
-python data/generate_sample_data.py
+# Development (synthetic data — output is stamped -synthetic):
+python data/make_synthetic.py
+python eval/run_eval.py --data data/pricing_synthetic.csv --allow-synthetic
 
-# Extract features
-python model/feature_extractor.py
-
-# Train model
-python model/train_model.py
-
-# Expected output:
-# Model Training Complete
-#   Test MAPE: 11.14%
-#   Blended MAPE: 11.54%
-#   Target: <11.6%
+# Real data (drop the provided CSV first), no flag:
+python eval/run_eval.py --data data/pricing_real.csv
 ```
 
-### Running Tests
+Commit `functions/model.json` so it deploys with the function.
+
+## Run the tests
 
 ```bash
-# All tests
-pytest tests/test_model.py -v
-
-# Specific test
-pytest tests/test_model.py::TestModel::test_model_mape_below_baseline -v
-
-# With coverage
-pytest tests/test_model.py --cov=model --cov-report=html
+pytest          # Python suite (domain, data, features, model, calibration, metrics)
+npm test        # Node suite (contract, calibration, feature parity, edge/OOD, clarify)
 ```
 
-### Local API Testing
+## Run the endpoint locally
 
 ```bash
-# Option 1: Using curl
-export GAUNTLET_PRICING_SECRET="test-secret-key"
-curl -X POST http://localhost:3000/.netlify/functions/pricing-estimate \
-  -H "Authorization: Bearer test-secret-key" \
+export GAUNTLET_PRICING_SECRET="local-dev-secret"     # Windows: set GAUNTLET_PRICING_SECRET=...
+netlify dev                                            # serves functions on http://localhost:8888
+
+curl -X POST http://localhost:8888/.netlify/functions/pricing-estimate \
+  -H "Authorization: Bearer local-dev-secret" \
   -H "Content-Type: application/json" \
-  -d '{
-    "job_id": "test_001",
-    "service_category": "Plumbing",
-    "zip_code": "78704",
-    "job_description": "Replace water heater",
-    "deadline": "Within 1-2 weeks"
-  }'
-
-# Option 2: Using Python
-python -c "
-import json
-import requests
-
-headers = {
-    'Authorization': 'Bearer test-secret-key',
-    'Content-Type': 'application/json'
-}
-data = {
-    'job_id': 'test_001',
-    'service_category': 'Plumbing',
-    'zip_code': '78704',
-    'job_description': 'Replace water heater'
-}
-response = requests.post('http://localhost:3000/.netlify/functions/pricing-estimate', json=data, headers=headers)
-print(json.dumps(response.json(), indent=2))
-"
+  -d '{"job_id":"abc123","service_category":"Plumbing","zip_code":"78704",
+       "job_description":"Replace 3 plumbing fixtures","original_estimate":360}'
 ```
 
-## Deployment to Netlify
+The function throws on cold start if `GAUNTLET_PRICING_SECRET` is unset, and
+returns `500 {"error":"Estimate failed"}` if `model.json` is missing.
 
-### Prerequisites
-- Netlify account (free)
-- GitHub repository (connected to Netlify)
-
-### Step 1: Connect Repository
-1. Go to [app.netlify.com](https://app.netlify.com)
-2. Click "Add new site" → "Import an existing project"
-3. Select GitHub repository
-4. Authorize Netlify with GitHub
-
-### Step 2: Configure Build Settings
-- **Build command:** `npm install`
-- **Publish directory:** `public` (not used for functions)
-- **Functions directory:** `functions`
-
-### Step 3: Set Environment Variables
-In Netlify dashboard:
-1. Go to "Site settings" → "Build & deploy" → "Environment"
-2. Add variable: `GAUNTLET_PRICING_SECRET = <your-secret-key>`
-
-### Step 4: Deploy
-```bash
-# Automatic deploys on git push to main
-# Or manual deploy:
-netlify deploy --prod
-```
-
-## Production Checklist
-
-- [ ] Model trained on full dataset (1,432 rows)
-- [ ] MAPE verified: <11.6% (blended), <40% (real-only)
-- [ ] All tests passing: `pytest tests/ -v`
-- [ ] Environment variable set: `GAUNTLET_PRICING_SECRET`
-- [ ] API auth working: Bearer token validation
-- [ ] Response time < 2 seconds (with Claude API calls cached)
-- [ ] OOD confidence calibration verified (category, price, interval)
-- [ ] README reviewed and tested
-- [ ] AI_USAGE.md complete with 5-10 key prompts
-- [ ] Demo video recorded (2-3 min walkthrough)
-
-## Troubleshooting
-
-### GAUNTLET_PRICING_SECRET Error
-```
-Error: GAUNTLET_PRICING_SECRET env var is required
-```
-**Fix:** Set environment variable before running
-```bash
-export GAUNTLET_PRICING_SECRET="your-secret-key"  # Unix/Mac
-set GAUNTLET_PRICING_SECRET=your-secret-key       # Windows
-```
-
-### MAPE > 11.6% (Model Underperforming)
-- Check dataset: `python model/data_explorer.py`
-- Verify feature extraction: `python model/feature_extractor.py`
-- Try different alpha in Ridge regression
-- Collect more labeled examples (277 is relatively small)
-
-### Claude API Rate Limits
-- Implement request batching for scope extraction
-- Cache extracted features to disk
-- Use Claude Sonnet instead of Opus for cost savings
-
-### Netlify Deploy Failures
-- Check build logs: Netlify dashboard → "Deploys"
-- Verify `netlify.toml` syntax
-- Ensure `functions/` directory exists
-- Run `netlify dev` locally first
-
-## Testing in Staging
+## Run the web app locally
 
 ```bash
-# Deploy to staging (test branch)
-git checkout -b feature/my-changes
-git push origin feature/my-changes
-# Netlify auto-deploys to preview URL
-
-# Get preview URL from Netlify dashboard
-PREVIEW_URL="https://deploy-preview-123--my-site.netlify.app"
-
-# Test against preview
-curl -X POST $PREVIEW_URL/.netlify/functions/pricing-estimate \
-  -H "Authorization: Bearer $GAUNTLET_PRICING_SECRET" \
-  -d '{"job_id":"test","service_category":"Plumbing","zip_code":"78704","job_description":"Replace water heater"}'
+npm run build:ui      # = python eval/export_ui.py --data data/pricing_synthetic.csv --allow-synthetic
+npm run serve         # = python -m http.server 8787 --directory public
+# open http://127.0.0.1:8787          -> storefront (index.html)
+# open http://127.0.0.1:8787/pricing.html  -> Instant Estimate flow
 ```
+
+Both pages are static and run in the browser. The pricing page runs inference
+from `public/model.json` (no function needed); the storefront compiles its JSX
+via Babel from a CDN (needs internet on first load).
+
+## End-to-end UI smoke test
+
+```bash
+pip install playwright && python -m playwright install chromium   # one-time
+python eval/e2e_smoke.py        # starts a server, drives storefront + pricing flow, exits non-zero on failure
+```
+
+## Deploy to Netlify
+
+Config lives in [netlify.toml](netlify.toml) (functions dir `functions`, publish dir `public`).
+
+1. Connect the GitHub repo at [app.netlify.com](https://app.netlify.com) (Add new site -> Import).
+2. Build settings: build command `npm install`, functions directory `functions`,
+   publish directory `public`.
+3. Set environment variable `GAUNTLET_PRICING_SECRET` (Site settings -> Environment).
+4. Ensure `functions/model.json` is committed. Deploy on push, or `netlify deploy --prod`.
+
+Endpoint URL: `https://<site>.netlify.app/.netlify/functions/pricing-estimate`.
+
+## Environment variables
+
+- `GAUNTLET_PRICING_SECRET` — bearer secret (required).
+- `PRICING_MODEL_PATH` — optional override of the model.json path (tests use this).
 
 ## Rollback
 
 ```bash
-# Revert to previous deploy in Netlify dashboard
-# Or redeploy previous commit:
-git checkout <previous-commit>
-git push origin main --force-with-lease  # Use with caution!
+git revert <commit>     # revert code/model change, redeploy
 ```
+
+Or roll back to a previous deploy in the Netlify dashboard (Deploys -> a prior
+deploy -> Publish).
+
+## Troubleshooting
+
+- `GAUNTLET_PRICING_SECRET env var is required` — set the env var before serving.
+- `500 {"error":"Estimate failed"}` — usually `functions/model.json` is missing;
+  run the eval gate to produce it.
+- `Refusing to proceed: dataset looks synthetic` — you ran the harness on
+  synthetic data without `--allow-synthetic`. Add the flag for dev, or drop the
+  real CSV at `data/pricing_real.csv`.
+
+## Out of scope (current)
+
+- **Posting to the HouseAccount staging `bookings-create` endpoint** is deferred.
+  This service is the receiving side of the contract; the outbound demo client is
+  a tracked follow-up.
+- Load testing, caching headers, and async webhooks are out of scope per the brief.
