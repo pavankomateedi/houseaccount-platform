@@ -275,7 +275,7 @@
           <label>Service category</label>
           <select id="category"></select>
           <label>What needs doing?</label>
-          <textarea id="desc">Replace 4 plumbing fixtures, you supply materials</textarea>
+          <textarea id="desc"></textarea>
           <label>Deadline</label>
           <select id="deadline">
             <option>As soon as possible</option>
@@ -421,6 +421,35 @@
       for (const c of model.spec.category_vocab) {
         const o = new Option(c, c); if (c === 'Plumbing') o.selected = true; $('category').append(o);
       }
+
+      // Category-aware example shown as a placeholder (clears automatically when
+      // the user types — never prefilled text the user has to delete).
+      const DESC_EXAMPLES = {
+        Plumbing: 'e.g. Replace a leaky kitchen faucet and unclog the bathroom sink',
+        Electrical: 'e.g. Install 3 new outlets and a ceiling fan in the living room',
+        HVAC: "e.g. AC isn't cooling — needs a service call before summer",
+        Cleaning: 'e.g. Deep clean a 2-bedroom apartment, including oven and windows',
+        'Pest Control': 'e.g. Treat for ants and set up a quarterly plan',
+        Landscaping: 'e.g. Mow, edge, and trim the hedges on a small front yard',
+        Handyman: 'e.g. Mount a TV, hang 3 shelves, and patch a drywall hole',
+        Exterior: 'e.g. Power-wash the driveway and the back patio',
+        'Appliance Repair': "e.g. Dishwasher won't drain — needs a diagnosis and fix",
+        Auto: 'e.g. Mobile oil change and brake inspection in the driveway',
+        Chimney: 'e.g. Inspect and sweep one chimney before winter',
+        Flooring: 'e.g. Install LVP flooring in a 200 sq ft bedroom',
+        'General Contractor': 'e.g. Convert a garage into a home office',
+        Moving: 'e.g. Move a 2-bedroom apartment across town, some heavy furniture',
+        Painting: 'e.g. Paint the living room and hallway, two coats',
+        Pool: 'e.g. Open the pool for the season and balance the chemicals',
+        Remodeling: 'e.g. Remodel a small bathroom — new vanity, tile, and fixtures',
+        Roofing: 'e.g. Repair a roof leak around the chimney flashing',
+      };
+      const DESC_FALLBACK = 'e.g. Describe the job — size, quantity, and any materials';
+      function setDescPlaceholder() {
+        $('desc').placeholder = DESC_EXAMPLES[$('category').value] || DESC_FALLBACK;
+      }
+      $('category').addEventListener('change', setDescPlaceholder);
+      setDescPlaceholder();
 
       function readForm() {
         const num = (id) => ($(id).value === '' ? null : Number($(id).value));
