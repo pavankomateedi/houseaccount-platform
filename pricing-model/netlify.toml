@@ -12,11 +12,6 @@ included_files = ["functions/model.json"]
 [dev]
 command = "npm run dev"
 
-[[redirects]]
-from = "/.netlify/functions/*"
-to = "/.netlify/functions/:splat"
-status = 200
-
 [[headers]]
 for = "/.netlify/functions/pricing-estimate"
 [headers.values]

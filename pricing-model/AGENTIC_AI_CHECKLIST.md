@@ -110,7 +110,7 @@
 
 ## 8. Deployment
 
-- [x] Pinned model versions & deps: [requirements.txt](requirements.txt) pinned; [package.json](package.json)
+- [x] Pinned model versions & deps: [requirements-dev.txt](requirements-dev.txt) pinned (dev/training only); [package.json](package.json)
 - [x] Externalized config: secret + `PRICING_MODEL_PATH` via env
 - [x] Secrets in a manager: Netlify environment variables (not a dedicated vault — adequate for single shared secret)
 - [~] Staging environment: HouseAccount provides the staging booking endpoint; integration POST not yet wired (GAP)

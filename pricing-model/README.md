@@ -16,7 +16,7 @@ cd pricing-model
 
 # 1. Python env + deps
 python -m venv .venv && . .venv/Scripts/activate    # macOS/Linux: source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # dev/training only; NOT needed to deploy
 
 # 2. Node deps (for the endpoint + its tests)
 npm install
