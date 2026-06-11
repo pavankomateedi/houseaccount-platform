@@ -3,6 +3,12 @@ command = "npm install"
 functions = "functions"
 publish = "public"
 
+# Bundle the exported model so the function can read it at runtime
+# (it is loaded via fs, not imported, so esbuild won't include it otherwise).
+[functions]
+node_bundler = "esbuild"
+included_files = ["functions/model.json"]
+
 [dev]
 command = "npm run dev"
 
