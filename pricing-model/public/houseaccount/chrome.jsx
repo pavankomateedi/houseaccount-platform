@@ -21,7 +21,7 @@ const Header = ({ nav, route, cartCount, onCartOpen, query, setQuery }) => (
           onClick={() => nav("catalog")}>Services</button>
         <button className={route.page === "catalog" && route.tab === "providers" ? "on" : ""}
           onClick={() => nav("catalog", { tab: "providers" })}>Providers</button>
-        <a className="estimate" href="pricing.html">Instant Estimate</a>
+        <a className="estimate" href="pricing.html">Instant Price Estimate</a>
       </nav>
       <div className="search">
         <Icon name="search" size={16} sw={2} />
